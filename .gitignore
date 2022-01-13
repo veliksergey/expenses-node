@@ -104,3 +104,7 @@ dist
 .tern-port
 
 builds
+
+
+.idea
+./public
