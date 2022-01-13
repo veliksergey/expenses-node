@@ -107,4 +107,4 @@ builds
 
 
 .idea
-./public
+build/
