@@ -1,0 +1,5 @@
+
+// create migration help (use -- to pass parameter)
+npm run typeorm migration -- -h
+npm run typeorm migration:create -- -d src/migration -n TestMigration
+

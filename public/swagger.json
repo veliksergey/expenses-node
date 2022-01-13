@@ -1,0 +1,488 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"Project": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"projectName": {
+						"type": "string"
+					},
+					"transactions": {
+						"items": {
+							"$ref": "#/components/schemas/Transaction"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"projectName",
+					"transactions"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Transaction": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"transName": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"notes": {
+						"type": "string"
+					},
+					"projectId": {
+						"type": "number",
+						"format": "double"
+					},
+					"project": {
+						"$ref": "#/components/schemas/Project"
+					},
+					"vendorId": {
+						"type": "number",
+						"format": "double"
+					},
+					"vendor": {
+						"$ref": "#/components/schemas/Vendor"
+					},
+					"related": {
+						"items": {
+							"$ref": "#/components/schemas/Transaction"
+						},
+						"type": "array"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"id",
+					"transName",
+					"amount",
+					"date",
+					"notes",
+					"projectId",
+					"project",
+					"vendorId",
+					"vendor",
+					"related",
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Vendor": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"vendorName": {
+						"type": "string"
+					},
+					"transactions": {
+						"items": {
+							"$ref": "#/components/schemas/Transaction"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"vendorName",
+					"transactions"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"iProjectPayload": {
+				"properties": {
+					"projectName": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"projectName"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"iVendorPayload": {
+				"properties": {
+					"vendorName": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"vendorName"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"iTransPayload": {
+				"properties": {
+					"transName": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"projectId": {
+						"type": "number",
+						"format": "double"
+					},
+					"vendorId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"transName",
+					"amount",
+					"date",
+					"projectId",
+					"vendorId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "expenses-node",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/projects": {
+			"get": {
+				"operationId": "GetProjects",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Project"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Project"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateProject",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Project"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Project"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/iProjectPayload"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/projects/{id}": {
+			"get": {
+				"operationId": "GetProject",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/Project"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Project"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/vendors": {
+			"get": {
+				"operationId": "GetVendors",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Vendor"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"vendor"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateVendor",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Vendor"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"vendor"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/iVendorPayload"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/vendors/{id}": {
+			"get": {
+				"operationId": "GetVendor",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/Vendor"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"vendor"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/transactions": {
+			"get": {
+				"operationId": "GetTransactions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"transactionCount": {
+											"type": "number",
+											"format": "double"
+										},
+										"transactions": {
+											"items": {
+												"$ref": "#/components/schemas/Transaction"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"transactionCount",
+										"transactions"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"transaction"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"transaction"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/iTransPayload"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/transactions/{id}": {
+			"get": {
+				"operationId": "GetTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/Transaction"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"transaction"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
