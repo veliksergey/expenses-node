@@ -3,3 +3,5 @@
 npm run typeorm migration -- -h
 npm run typeorm migration:create -- -d src/migration -n TestMigration
 
+// kill port:
+fuser 8008/tcp -k

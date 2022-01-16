@@ -1,9 +1,9 @@
 import {Get, Route, Tags, Post, Body, Path} from 'tsoa';
-import {Project} from '../models/project';
+import {Project} from '../models';
 import {getProjects, getProject, createProject, iProjectPayload} from '../repositories/project.repository';
 
 @Route('projects')
-@Tags('Project')
+@Tags('project')
 export default class ProjectController {
   @Get('/')
   public async getProjects(): Promise<Array<Project>> {

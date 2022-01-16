@@ -9,25 +9,24 @@ import {
   DeleteDateColumn,
   Index,
   ManyToMany,
-  JoinTable
+  JoinTable, OneToMany
 } from 'typeorm';
-import {Project, Vendor} from './index';
+import {Project, Vendor, Account, Person, Cat, Doc} from './index';
 
 @Entity()
 export class Transaction {
 
+  // id
   @PrimaryGeneratedColumn()
   id!: number;
 
+  // name
   @Column({
     length: 100,
-    nullable: false,
-    update: true,
-    insert: true,
-    select: true,
   })
   transName!: string;
 
+  // amount
   @Column({
     type: 'decimal',
     precision: 10,
@@ -35,52 +34,123 @@ export class Transaction {
   })
   amount!: number;
 
+  // related amount
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
+  relatedAmount!: number;
+
+  // date
   @Column({
     type: 'date',
     default: () => 'CURRENT_DATE'
   })
   date!: Date;
 
+  // related date
+  @Column({
+    type: 'date',
+    nullable: true,
+  })
+  relatedDate!: Date;
+
+  // non taxable
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  nonTaxable!: boolean
+
+  // notes
   @Column({
     type: 'text',
     nullable: true
   })
   notes!: string;
 
-  @Column({nullable: false,})
+  // account
+  @Column()
+  @Index()
+  accountId!: number;
+  @ManyToOne(type => Account, (account: Account) => account.transactions, {
+    // eager: true,
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn()
+  account!: Account
+
+  // category
+  @Column({nullable: true,})
+  @Index()
+  catId!: number;
+  @ManyToOne(type => Cat, (cat: Cat) => cat.transactions, {
+    // eager: true,
+    nullable: true,
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn()
+  cat!: Cat;
+
+  // person
+  @Column()
+  @Index()
+  personId!: number;
+  @ManyToOne(type => Person, (person: Person) => person.transactions, {
+    // eager: true,
+    nullable: true,
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn()
+  person!: Person;
+
+  // project
+  @Column()
   @Index()
   projectId!: number;
   @ManyToOne(type => Project, (project: Project) => project.transactions, {
-    eager: true,
-    nullable: false,
+    // eager: true,
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
   @JoinColumn()
   project!: Project;
 
-  @Column({nullable: false,})
+  // vendor
+  @Column()
   @Index()
   vendorId!: number;
   @ManyToOne(type => Vendor, (vendor: Vendor) => vendor.transactions, {
-    eager: true,
-    nullable: false,
+    // eager: true,
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
   @JoinColumn()
   vendor!: Vendor;
 
+  // documents (receipts, invoices)
+  @OneToMany(type => Doc, (doc: Doc) => doc.transactions)
+  docs!: Array<Doc>;
+
+  // related transactions
   @ManyToMany(type => Transaction)
   @JoinTable()
   related!: Array<Transaction>
 
+  // createdAt
   @CreateDateColumn({select: false})
   createdAt!: Date;
 
+  // updatedAt
   @UpdateDateColumn({select: false})
   updatedAt!: Date;
 
+  // deletedAt
   @DeleteDateColumn({select: false})
   deletedAt?: Date;
 

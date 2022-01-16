@@ -1,5 +1,4 @@
 import {getRepository} from 'typeorm';
-// import {Project} from '../models';
 import {Project} from '../models';
 
 export interface iProjectPayload {
