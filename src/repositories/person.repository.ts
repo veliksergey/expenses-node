@@ -5,7 +5,7 @@ export interface iPersonPayload {
   name: string,
 }
 
-export const getPersons = async (): Promise<Array<Person>> => {
+export const getPeople = async (): Promise<Array<Person>> => {
   const personRepo = getRepository(Person);
   return personRepo.find();
 };

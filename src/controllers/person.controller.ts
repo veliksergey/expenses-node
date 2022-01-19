@@ -1,13 +1,13 @@
 import {Get, Route, Tags, Post, Body, Path} from 'tsoa';
 import {Person} from '../models';
-import {getPersons, getPerson, createPerson, iPersonPayload} from '../repositories/person.repository';
+import {getPeople, getPerson, createPerson, iPersonPayload} from '../repositories/person.repository';
 
-@Route('persons')
+@Route('people')
 @Tags('person')
 export default class PersonController {
   @Get('/')
-  public async getPersons(): Promise<Array<Person>> {
-    return getPersons();
+  public async getPeople(): Promise<Array<Person>> {
+    return getPeople();
   }
 
   @Get('/:id')

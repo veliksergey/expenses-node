@@ -914,9 +914,9 @@
 				]
 			}
 		},
-		"/persons": {
+		"/people": {
 			"get": {
-				"operationId": "GetPersons",
+				"operationId": "GetPeople",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -969,7 +969,7 @@
 				}
 			}
 		},
-		"/persons/{id}": {
+		"/people/{id}": {
 			"get": {
 				"operationId": "GetPerson",
 				"responses": {

@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const ctrl = new PersonCtrl();
-  const response = await ctrl.getPersons();
+  const response = await ctrl.getPeople();
   return res.json(response);
 });
 

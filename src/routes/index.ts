@@ -13,6 +13,6 @@ router.use('/vendors', VendorRouter);
 router.use('/transactions', TransRouter);
 router.use('/accounts', AccountRouter);
 router.use('/categories', CatRouter);
-router.use('/persons', PersonRouter);
+router.use('/people', PersonRouter);
 
 export default router;
