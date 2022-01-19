@@ -2,22 +2,22 @@ import {Entity, PrimaryGeneratedColumn, Column, Index, ManyToOne, JoinColumn} fr
 import {Transaction} from './transaction';
 
 @Entity()
-export class Doc {
+export class Document {
 
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column({length: 100})
-  docName!: string;
+  name!: string;
 
   @Column()
-  docLink!: string;
+  link!: string;
 
   // transaction
   @Column({nullable: false,})
   @Index()
   transactionId!: number;
-  @ManyToOne(type => Transaction, (trans: Transaction) => trans.docs, {
+  @ManyToOne(type => Transaction, (trans: Transaction) => trans.documents, {
     // eager: true,
     nullable: false,
     onDelete: 'RESTRICT',

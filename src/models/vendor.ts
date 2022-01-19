@@ -10,7 +10,7 @@ export class Vendor {
 
   @Column({length: 100,})
   @Index({unique: true,})
-  vendorName!: string;
+  name!: string;
 
   @OneToMany(type => Transaction, (trans: Transaction) => trans.vendor)
   transactions!: Array<Transaction>

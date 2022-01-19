@@ -11,7 +11,7 @@ import {
   ManyToMany,
   JoinTable, OneToMany
 } from 'typeorm';
-import {Project, Vendor, Account, Person, Cat, Doc} from './index';
+import {Project, Vendor, Account, Person, Category, Document} from './index';
 
 @Entity()
 export class Transaction {
@@ -24,7 +24,7 @@ export class Transaction {
   @Column({
     length: 100,
   })
-  transName!: string;
+  name!: string;
 
   // amount
   @Column({
@@ -86,15 +86,15 @@ export class Transaction {
   // category
   @Column({nullable: true,})
   @Index()
-  catId!: number;
-  @ManyToOne(type => Cat, (cat: Cat) => cat.transactions, {
+  categoryId!: number;
+  @ManyToOne(type => Category, (category: Category) => category.transactions, {
     // eager: true,
     nullable: true,
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
   @JoinColumn()
-  cat!: Cat;
+  category!: Category;
 
   // person
   @Column()
@@ -134,8 +134,8 @@ export class Transaction {
   vendor!: Vendor;
 
   // documents (receipts, invoices)
-  @OneToMany(type => Doc, (doc: Doc) => doc.transactions)
-  docs!: Array<Doc>;
+  @OneToMany(type => Document, (document: Document) => document.transactions)
+  documents!: Array<Document>;
 
   // related transactions
   @ManyToMany(type => Transaction)

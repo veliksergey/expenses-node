@@ -2,7 +2,7 @@ import {getRepository} from 'typeorm';
 import {Account} from '../models';
 
 export interface AccountPayload {
-  accountName: string,
+  name: string,
 }
 
 export const getAccounts = async ():Promise<Array<Account>> => {

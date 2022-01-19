@@ -9,14 +9,14 @@ export enum CatType {
 }
 
 @Entity()
-export class Cat {
+export class Category {
 
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column({length: 100})
   @Index({unique: true,})
-  catName!: string;
+  name!: string;
 
   @Column({
     type: 'smallint',
@@ -24,9 +24,9 @@ export class Cat {
     nullable: false,
     default: 0
   })
-  catType!: number;
+  type!: number;
 
-  @OneToMany(type => Transaction, (trans: Transaction) => trans.cat)
+  @OneToMany(type => Transaction, (trans: Transaction) => trans.category)
   transactions!: Array<Transaction>;
 
 }

@@ -1,5 +1,5 @@
 import express from 'express';
-import CatCtrl from '../controllers/cat.controller';
+import CatCtrl from '../controllers/category.controller';
 
 const router = express.Router();
 

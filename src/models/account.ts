@@ -9,7 +9,7 @@ export class Account {
 
   @Column({length: 100,})
   @Index({unique: true,})
-  accountName!: string;
+  name!: string;
 
   @OneToMany(type => Transaction, (trans: Transaction) => trans.account)
   transactions!: Array<Transaction>;

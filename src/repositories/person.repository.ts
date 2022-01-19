@@ -2,7 +2,7 @@ import {getRepository} from 'typeorm';
 import {Person} from '../models';
 
 export interface iPersonPayload {
-  personName: string,
+  name: string,
 }
 
 export const getPersons = async (): Promise<Array<Person>> => {

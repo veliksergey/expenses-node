@@ -3,7 +3,7 @@ import {getRepository} from 'typeorm';
 import {Vendor} from '../models';
 
 export interface iVendorPayload {
-  vendorName: string,
+  name: string,
 }
 
 export const getVendors = async():Promise<Array<Vendor>> => {

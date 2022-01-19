@@ -1,5 +1,5 @@
 import {ConnectionOptions} from 'typeorm';
-import {Project, Vendor, Transaction, Account, Cat, Person, Doc} from './src/models';
+import {Project, Vendor, Transaction, Account, Category, Person, Document} from './src/models';
 
 const config: ConnectionOptions = {
   name: 'default',
@@ -11,7 +11,7 @@ const config: ConnectionOptions = {
   database: process.env.DB_DATABASE || 'expenses',
   synchronize: process.env.DB_SYNCHRONIZE === 'true' || true,
   logging: process.env.DB_LOGGING === 'true' || false,
-  entities: [Project, Vendor, Transaction, Account, Cat, Person, Doc],
+  entities: [Project, Vendor, Transaction, Account, Category, Person, Document],
   // entities: ['src/models/**/*.ts'],
   migrations: [
     './migration/**/*.ts'

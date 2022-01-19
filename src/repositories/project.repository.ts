@@ -2,7 +2,7 @@ import {getRepository} from 'typeorm';
 import {Project} from '../models';
 
 export interface iProjectPayload {
-  projectName: string,
+  name: string,
 }
 
 export const getProjects = async (): Promise<Array<Project>> => {

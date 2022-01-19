@@ -9,7 +9,7 @@ export class Project {
 
   @Column({length: 100,})
   @Index({unique: true,}) // ToDo: do I need indexes for names??
-  projectName!: string;
+  name!: string;
 
   @OneToMany(type => Transaction, (trans: Transaction) => trans.project)
   transactions!: Array<Transaction>;
