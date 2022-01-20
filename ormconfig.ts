@@ -9,7 +9,7 @@ const config: ConnectionOptions = {
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_DATABASE || 'expenses',
-  synchronize: process.env.DB_SYNCHRONIZE === 'true' || true,
+  synchronize: process.env.DB_SYNCHRONIZE === 'true' || false,
   logging: process.env.DB_LOGGING === 'true' || false,
   entities: [Project, Vendor, Transaction, Account, Category, Person, Document],
   // entities: ['src/models/**/*.ts'],

@@ -432,6 +432,18 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"iItemPayload": {
+				"properties": {
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
@@ -569,7 +581,22 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Vendor"
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/Vendor"
+										},
+										{
+											"properties": {
+												"errMsg": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"errMsg"
+											],
+											"type": "object"
+										}
+									]
 								}
 							}
 						}
@@ -1003,6 +1030,190 @@
 						}
 					}
 				]
+			}
+		},
+		"/items/{type}": {
+			"get": {
+				"operationId": "GetItems",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"properties": {
+												"errMsg": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"errMsg"
+											],
+											"type": "object"
+										},
+										{
+											"items": {
+												"anyOf": [
+													{
+														"$ref": "#/components/schemas/Account"
+													},
+													{
+														"$ref": "#/components/schemas/Category"
+													},
+													{
+														"$ref": "#/components/schemas/Person"
+													},
+													{
+														"$ref": "#/components/schemas/Project"
+													},
+													{
+														"$ref": "#/components/schemas/Vendor"
+													}
+												]
+											},
+											"type": "array"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"item"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreateItem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"item"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/iItemPayload"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/items/{type}/{id}": {
+			"get": {
+				"operationId": "GetItem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"item"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateItem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"item"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/iItemPayload"
+							}
+						}
+					}
+				}
 			}
 		}
 	},

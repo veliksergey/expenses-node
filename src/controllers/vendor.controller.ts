@@ -18,7 +18,7 @@ export default class VendorController {
   }
 
   @Post('/')
-  public async createVendor(@Body() body: iVendorPayload): Promise<Vendor> {
+  public async createVendor(@Body() body: iVendorPayload): Promise<Vendor | { errMsg: string }> {
     return createVendor(body);
   }
 }
