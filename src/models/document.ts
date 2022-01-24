@@ -11,7 +11,7 @@ export class Document {
   name!: string;
 
   @Column()
-  link!: string;
+  path!: string;
 
   // transaction
   @Column({nullable: false,})
@@ -24,6 +24,6 @@ export class Document {
     onUpdate: 'CASCADE',
   })
   @JoinColumn()
-  transactions!: Transaction;
+  transaction!: Transaction;
 
 }

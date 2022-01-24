@@ -3,6 +3,7 @@ import {createConnection} from 'typeorm';
 import express, {Application} from 'express';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
+const path = require('path');
 
 import Router from './routes';
 import dbConfig from '../ormconfig';
@@ -33,6 +34,9 @@ app.use(
     },
   }),
 );
+
+const uploadDir = path.join(__dirname + '../../uploads');
+app.use(express.static(uploadDir));
 
 app.use(Router);
 

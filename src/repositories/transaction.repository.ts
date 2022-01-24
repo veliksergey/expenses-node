@@ -1,6 +1,9 @@
 import {getRepository, ILike} from 'typeorm';
-import {Transaction} from '../models';
+import {Transaction, Document} from '../models';
+import {moveFile} from '../functions/files';
+import {createDocument} from './document.repository';
 
+export interface iItemPayload {id: number, name: string};
 export interface iTransPayload {
   name: string,
   amount: number,
@@ -14,8 +17,15 @@ export interface iTransPayload {
   accountId: number,
   personId: number,
   categoryId: number,
-  documents: Array<{name: string, link: string}>,
+  documents: Array<{ name: string, path: string }>,
   related: Array<any>,
+  fileName: string,
+  fileInTemp: string,
+  account: iItemPayload,
+  category: iItemPayload,
+  person: iItemPayload,
+  project: iItemPayload,
+  vendor: iItemPayload,
 }
 
 function prepareOrderByWay(orderBy: string, orderWay: string): any {
@@ -31,30 +41,30 @@ export const getTransactions = async (): Promise<any> => {
   const transRepo = getRepository(Transaction);
 
   const search: string = '';
-  const order = prepareOrderByWay('name', 'ASC');
+  const order = prepareOrderByWay('date', 'DESC');
   const page: number = +'1';
   const take: number = Number('10'); // limit
   const skip: number = (page - 1) * take;
 
   // ToDo: search, pagination, etc
-  // return await transRepo.find({relations: ['project']});
+  /*return await transRepo.find({relations: ['project']});
 
-  // const [transactions, transactionCount] = await transRepo
-  //   .findAndCount({relations: ['related']});
-  //
-  // return {transactions, transactionCount};
+  const [transactions, transactionCount] = await transRepo
+    .findAndCount({relations: ['related']});
 
-  // const trans = await transRepo
-  //   .createQueryBuilder('t')
-  //   // .select(['t.id', 't.name', 't.amount', 't.date', 't.notes'])
-  //   .leftJoinAndSelect('t.project', 'project')
-  //   .leftJoinAndSelect('t.vendor', 'vendor')
-  //   // .leftJoinAndSelect('t.related', 'transaction')
-  //   .skip(skip) // pagination
-  //   .take(take)
-  //   .maxExecutionTime(5000) // limit of execution time to avoid a server crashing
-  //   .printSql() // for debugging
-  //   .getMany();
+  return {transactions, transactionCount};
+
+  const trans = await transRepo
+    .createQueryBuilder('t')
+    // .select(['t.id', 't.name', 't.amount', 't.date', 't.notes'])
+    .leftJoinAndSelect('t.project', 'project')
+    .leftJoinAndSelect('t.vendor', 'vendor')
+    // .leftJoinAndSelect('t.related', 'transaction')
+    .skip(skip) // pagination
+    .take(take)
+    .maxExecutionTime(5000) // limit of execution time to avoid a server crashing
+    .printSql() // for debugging
+    .getMany();*/
 
   let findOptions: any = {
     skip, take, order,
@@ -77,19 +87,81 @@ export const getTransactions = async (): Promise<any> => {
 
 export const getTransaction = async (id: number): Promise<Transaction | null> => {
   const transRepo = getRepository(Transaction);
-  const trans = await transRepo.findOne({id});
-  console.log('-- trans:', trans);
+  const trans = await transRepo.findOne({
+    where: {id},
+    relations: ['account', 'category', 'person', 'project', 'vendor']
+  });
   if (!trans) return null;
   return trans;
 };
 
-export const createTransaction = async (payload: iTransPayload): Promise<Transaction> => {
+export const createTransaction = async (payload: iTransPayload): Promise<Transaction | { errMsg: string } | null> => {
   const transRepo = getRepository(Transaction);
-  const trans = new Transaction();
 
-  // ToDo: get it from DB
-  return transRepo.save({
-    ...trans,
-    ...payload
+  // create transaction
+  const newTrans = new Transaction();
+  const transCreated = transRepo.create({
+    ...newTrans,
+    ...(transformTransaction(payload))
   });
+
+  try {
+
+    // save transaction
+    const savedTrans = await transRepo.save(transCreated);
+
+    // move file
+    const fileInTemp = payload.fileInTemp;
+    if (fileInTemp) {
+      const onlyFileNameInTemp = fileInTemp.substring(fileInTemp.indexOf(".") + 1);
+      const projectName = replaceInString(payload.project.name, '.', '_');
+      const vendorName = replaceInString(payload.vendor.name, '.', '_');
+      const amount = replaceInString(payload.amount, '.', '');
+      let newFileName = `${savedTrans.id}.${projectName}.${vendorName}.${amount}.${onlyFileNameInTemp}`
+        .trim().replace(/\s+/g, '_');
+      const fileRes = moveFile({
+        oldFolder: 'temp',
+        oldFile: fileInTemp,
+        newFolder: 't',
+        newFile: newFileName
+      });
+      if (fileRes.errMsg) return {errMsg: fileRes.errMsg}
+
+      // save document
+      await createDocument({
+        name: payload.fileName || onlyFileNameInTemp,
+        path: fileRes.path,
+        transactionId: savedTrans.id
+      })
+    }
+
+    // get saved transaction from DB
+    const transToReturn = await getTransaction(savedTrans.id);
+    return transToReturn;
+
+  } catch (err) {
+    console.error(err);
+    return {errMsg: 'Problem in saving transaction!'};
+  }
 };
+
+
+
+// FUNCTIONS
+function transformTransaction(trans: iTransPayload) {
+  const {
+    name, amount, relatedAmount, date, relatedDate, nonTaxable, notes, fileName, fileInTemp,
+    accountId, categoryId, personId, projectId, vendorId,
+    account, category, person, project, vendor
+  } = trans;
+  return {
+    name, amount, relatedAmount, date, relatedDate, nonTaxable, notes,
+    accountId, categoryId, personId, projectId, vendorId,
+  };
+}
+function replaceInString(value: string | number, replaceWhat: string, replaceWith: string): string {
+  // if (typeof value === 'number') value = value.toString();
+  return value.toString().trim()
+    .replace(/\s+/g, '_') // replaces spaces with "_"
+    .split(replaceWhat).join(replaceWith);
+}

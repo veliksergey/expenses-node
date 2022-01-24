@@ -5,3 +5,8 @@ npm run typeorm migration:create -- -d src/migration -n TestMigration
 
 // kill port:
 fuser 8008/tcp -k
+
+// typeorm cli
+// use "typeorm" in package.json
+// example sync schemas with DB:
+npm run typeorm schema:sync

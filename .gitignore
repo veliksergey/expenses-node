@@ -108,3 +108,9 @@ builds
 
 .idea
 build/
+
+# upload
+uploads/temp/*
+!uploads/temp/.gitkeep
+uploads/t/*
+!uploads/t/.gitkeep

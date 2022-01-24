@@ -8,19 +8,19 @@ export interface iItemPayload {
 const getModel = (type: string) => {
   let model;
   switch (type) {
-    case 'account':
+    case 'accounts':
       model = Account;
       break;
-    case 'category':
+    case 'categories':
       model = Category;
       break;
-    case 'person':
+    case 'people':
       model = Person;
       break;
-    case 'project':
+    case 'projects':
       model = Project;
       break;
-    case 'vendor':
+    case 'vendors':
       model = Vendor;
       break;
   }
@@ -33,14 +33,34 @@ const getItemRepo = (type: string) => {
   return getRepository(model);
 }
 
+export const getAllItems = async(): Promise<any> => {
+  const types = ['accounts', 'categories', 'people', 'projects', 'vendors'];
+  const arrayOfPromises: any = [];
+
+  types.forEach(type => {
+    const itemRepo = getItemRepo(type);
+    if (!itemRepo) return {errMsg: 'wrong item type'};
+    arrayOfPromises.push(itemRepo.find({order: {name: 'ASC'}}));
+  });
+
+  return Promise.all(arrayOfPromises).then(values => {
+    const obj: any = {};
+
+    types.forEach((type, idx) => {
+      obj[type] = values[idx];
+    });
+
+    return obj;
+  });
+}
+
 export const getItems = async(type: string): Promise<({ errMsg: string } | Array<Account | Category | Person | Project | Vendor>)> => {
   const itemRepo = getItemRepo(type);
   if (!itemRepo) return {errMsg: 'wrong item type'};
-  return itemRepo.find();
+  return itemRepo.find({order: {id: 'DESC'}});
 }
 
 export const getItem = async(type: string, id: number): Promise<Account | Category | Person | Project | Vendor | null | {errMsg: string}> => {
-  console.log('-- getItem:', type, id);
   const itemRepo = getItemRepo(type);
   if (!itemRepo) return {errMsg: 'wrong item type'};
 
@@ -53,21 +73,13 @@ export const createItem = async (type: string, payload: iItemPayload): Promise<a
   if (!itemRepo) return {errMsg: 'wrong item type'};
   const model = getModel(type);
   if (!model) return {errMsg: 'could not get model'};
+
   const item = new model();
+  item.name = payload.name;
 
-  const created = itemRepo.create({
-    ...item,
-    ...payload,
-  });
+  // const created = itemRepo.create(item);
 
-  // return await itemRepo.save(
-  //   created
-  // ).catch(err => {
-  //   console.error(err);
-  //   return {errMsg: err.detail};
-  // })
-
-  return itemRepo.save(created)
+  return itemRepo.save(item)
     .then(savedItem => {
       return savedItem;
     })
@@ -93,6 +105,23 @@ export const updateItem = async (type: string, id: number, payload: iItemPayload
     })
     .catch(err => {
       console.error(err);
-      return {errMsg: `Cannot save ${type}. ${err.detail}`};
+      return {errMsg: `Cannot save ${type}. ${err.detail}`}
+    })
+}
+
+export const deleteItem = async (type: string, id: number): Promise<{errMsg: string} | {deleted: boolean}> => {
+  const itemRepo = getItemRepo(type);
+  if (!itemRepo) return {errMsg: 'wrong item type'};
+
+  const item = await itemRepo.findOne(id);
+  if (!item) return {errMsg: 'Cannot find an item for deletion'}
+
+  return itemRepo.delete(item)
+    .then(deleted => {
+      return {deleted: true};
+    })
+    .catch(err => {
+      console.error(err);
+      return {errMsg: `Cannot delete item. ${err.detail}`}
     })
 }

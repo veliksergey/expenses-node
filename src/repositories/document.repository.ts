@@ -3,11 +3,11 @@ import {Document} from '../models';
 
 export interface iDocPayload {
   name: string,
-  link: string,
+  path: string,
   transactionId: number,
 }
 
-export const getDocs = async (transactionId: number): Promise<Array<Document>> => {
+export const getDocuments = async (transactionId: number): Promise<Array<Document>> => {
   const docRepo = getRepository(Document);
   return docRepo.find({
     where: {transactionId}
@@ -22,8 +22,7 @@ export const getDocs = async (transactionId: number): Promise<Array<Document>> =
 // };
 
 
-// ToDo: work on upload documents
-export const createDoc = async (payload: iDocPayload): Promise<Document> => {
+export const createDocument = async (payload: iDocPayload): Promise<Document> => {
   const docRepo = getRepository(Document);
   const document = new Document();
   return docRepo.save({

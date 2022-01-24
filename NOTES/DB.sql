@@ -19,5 +19,14 @@ INSERT INTO transaction
     VALUES
     (1, 'electricity', 243.54, 0, '2022-01-05', '2022-01-08', false, 'paying bill for electricity', 1, 5, 1, 1, 5),
     (2, 'framing materials', 1890, 3456.1235, '2021-12-28', null, false, null, 3, 3, 1, 2, 2),
-    (3, 'testing nulls', 123.456, null, '2020-02-20', null, true, null, 1, null, 1, 1, 1),
-    (4, 'nn', 0, null, '2020-02-20', null, false, null, 2, null, 2, 2, 2);
+    (3, 'some null values', 123.456, null, '2020-02-20', null, true, null, 1, null, 1, 1, 1),
+    (4, 'N', 0, null, '2020-02-20', null, false, null, null, null, null, 2, 2);
+
+
+-- to fix duplicate key bug on .save
+SELECT setval(pg_get_serial_sequence('"account"', 'id'),(SELECT MAX("id") FROM "account") + 1);
+SELECT setval(pg_get_serial_sequence('"category"', 'id'),(SELECT MAX("id") FROM "category") + 1);
+SELECT setval(pg_get_serial_sequence('"person"', 'id'),(SELECT MAX("id") FROM "person") + 1);
+SELECT setval(pg_get_serial_sequence('"project"', 'id'),(SELECT MAX("id") FROM "project") + 1);
+SELECT setval(pg_get_serial_sequence('"vendor"', 'id'),(SELECT MAX("id") FROM "vendor") + 1);
+SELECT setval(pg_get_serial_sequence('"transaction"', 'id'),(SELECT MAX("id") FROM "transaction") + 1);

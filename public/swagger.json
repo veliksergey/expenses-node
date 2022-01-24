@@ -258,46 +258,39 @@
 					"name": {
 						"type": "string"
 					},
-					"link": {
+					"path": {
 						"type": "string"
 					},
 					"transactionId": {
 						"type": "number",
 						"format": "double"
 					},
-					"transactions": {
+					"transaction": {
 						"$ref": "#/components/schemas/Transaction"
 					}
 				},
 				"required": [
 					"id",
 					"name",
-					"link",
+					"path",
 					"transactionId",
-					"transactions"
+					"transaction"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"iProjectPayload": {
+			"iItemPayload": {
 				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
 					"name": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"name"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"iVendorPayload": {
-				"properties": {
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
+					"id",
 					"name"
 				],
 				"type": "object",
@@ -353,7 +346,7 @@
 					"documents": {
 						"items": {
 							"properties": {
-								"link": {
+								"path": {
 									"type": "string"
 								},
 								"name": {
@@ -361,7 +354,7 @@
 								}
 							},
 							"required": [
-								"link",
+								"path",
 								"name"
 							],
 							"type": "object"
@@ -371,6 +364,27 @@
 					"related": {
 						"items": {},
 						"type": "array"
+					},
+					"fileName": {
+						"type": "string"
+					},
+					"fileInTemp": {
+						"type": "string"
+					},
+					"account": {
+						"$ref": "#/components/schemas/iItemPayload"
+					},
+					"category": {
+						"$ref": "#/components/schemas/iItemPayload"
+					},
+					"person": {
+						"$ref": "#/components/schemas/iItemPayload"
+					},
+					"project": {
+						"$ref": "#/components/schemas/iItemPayload"
+					},
+					"vendor": {
+						"$ref": "#/components/schemas/iItemPayload"
 					}
 				},
 				"required": [
@@ -387,60 +401,14 @@
 					"personId",
 					"categoryId",
 					"documents",
-					"related"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"AccountPayload": {
-				"properties": {
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"iCatPayload": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"type": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"name",
-					"type"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"iPersonPayload": {
-				"properties": {
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"iItemPayload": {
-				"properties": {
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name"
+					"related",
+					"fileName",
+					"fileInTemp",
+					"account",
+					"category",
+					"person",
+					"project",
+					"vendor"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -458,203 +426,6 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/projects": {
-			"get": {
-				"operationId": "GetProjects",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Project"
-									},
-									"type": "array"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"project"
-				],
-				"security": [],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateProject",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Project"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"project"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/iProjectPayload"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/projects/{id}": {
-			"get": {
-				"operationId": "GetProject",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/Project"
-										}
-									],
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"project"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/vendors": {
-			"get": {
-				"operationId": "GetVendors",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Vendor"
-									},
-									"type": "array"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"vendor"
-				],
-				"security": [],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateVendor",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/Vendor"
-										},
-										{
-											"properties": {
-												"errMsg": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"errMsg"
-											],
-											"type": "object"
-										}
-									]
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"vendor"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/iVendorPayload"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/vendors/{id}": {
-			"get": {
-				"operationId": "GetVendor",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/Vendor"
-										}
-									],
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"vendor"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
 		"/transactions": {
 			"get": {
 				"operationId": "GetTransactions",
@@ -700,7 +471,23 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Transaction"
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/Transaction"
+										},
+										{
+											"properties": {
+												"errMsg": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"errMsg"
+											],
+											"type": "object"
+										}
+									],
+									"nullable": true
 								}
 							}
 						}
@@ -759,277 +546,24 @@
 				]
 			}
 		},
-		"/accounts": {
+		"/items/all": {
 			"get": {
-				"operationId": "GetAccounts",
+				"operationId": "GetAllItems",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Account"
-									},
-									"type": "array"
-								}
+								"schema": {}
 							}
 						}
 					}
 				},
 				"tags": [
-					"account"
+					"item"
 				],
 				"security": [],
 				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateAccount",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Account"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"account"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/AccountPayload"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/accounts/{id}": {
-			"get": {
-				"operationId": "GetAccount",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/Account"
-										}
-									],
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"account"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/categories": {
-			"get": {
-				"operationId": "GetCats",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Category"
-									},
-									"type": "array"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"category"
-				],
-				"security": [],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreateCat",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Category"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"category"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/iCatPayload"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/categories/{id}": {
-			"get": {
-				"operationId": "GetCat",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/Category"
-										}
-									],
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"category"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/people": {
-			"get": {
-				"operationId": "GetPeople",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Person"
-									},
-									"type": "array"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"person"
-				],
-				"security": [],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "CreatePerson",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Person"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"person"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/iPersonPayload"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/people/{id}": {
-			"get": {
-				"operationId": "GetPerson",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/Person"
-										}
-									],
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"person"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
 			}
 		},
 		"/items/{type}": {
@@ -1210,6 +744,130 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/iItemPayload"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteItem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"properties": {
+												"errMsg": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"errMsg"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"deleted": {
+													"type": "boolean"
+												}
+											},
+											"required": [
+												"deleted"
+											],
+											"type": "object"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"item"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/documents": {
+			"get": {
+				"operationId": "GetDocuments",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Document"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"document"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "transactionId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreateDocument",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Document"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"document"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Document"
 							}
 						}
 					}

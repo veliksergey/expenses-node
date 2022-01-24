@@ -72,7 +72,7 @@ export class Transaction {
   notes!: string;
 
   // account
-  @Column()
+  @Column({nullable: true})
   @Index()
   accountId!: number;
   @ManyToOne(type => Account, (account: Account) => account.transactions, {
@@ -84,7 +84,7 @@ export class Transaction {
   account!: Account
 
   // category
-  @Column({nullable: true,})
+  @Column({nullable: true})
   @Index()
   categoryId!: number;
   @ManyToOne(type => Category, (category: Category) => category.transactions, {
@@ -97,7 +97,7 @@ export class Transaction {
   category!: Category;
 
   // person
-  @Column()
+  @Column({nullable: true})
   @Index()
   personId!: number;
   @ManyToOne(type => Person, (person: Person) => person.transactions, {
@@ -134,7 +134,7 @@ export class Transaction {
   vendor!: Vendor;
 
   // documents (receipts, invoices)
-  @OneToMany(type => Document, (document: Document) => document.transactions)
+  @OneToMany(type => Document, (document: Document) => document.transaction)
   documents!: Array<Document>;
 
   // related transactions

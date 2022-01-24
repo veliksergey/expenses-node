@@ -1,10 +1,23 @@
-import {Get, Post, Put, Route, Tags, Body, Path} from 'tsoa';
+import {Get, Post, Put, Route, Tags, Body, Path, Delete} from 'tsoa';
 import {Account, Category, Person, Project, Vendor} from '../models';
-import {createItem, getItem, getItems, iItemPayload, updateItem} from '../repositories/item.repository';
+import {
+  createItem,
+  getItem,
+  getItems,
+  iItemPayload,
+  updateItem,
+  deleteItem,
+  getAllItems
+} from '../repositories/item.repository';
 
 @Route('items')
 @Tags('item')
 export default class ItemController {
+
+  @Get('/all')
+  public async getAllItems():Promise<any> {
+    return getAllItems();
+  }
 
   @Get('/{type}')
   public async getItems(
@@ -38,4 +51,11 @@ export default class ItemController {
     return updateItem(type, Number(id), body);
   }
 
+  @Delete('/{type}/{id}')
+  public async deleteItem(
+    @Path() type: string,
+    @Path() id: string,
+  ): Promise<{errMsg: string} | {deleted: boolean}> {
+    return deleteItem(type, Number(id));
+  }
 }

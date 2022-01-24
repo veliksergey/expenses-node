@@ -1,5 +1,5 @@
 import {Get, Post, Route, Tags, Body, Path} from 'tsoa';
-import {Transaction} from '../models/transaction';
+import {Transaction} from '../models';
 import {getTransactions, getTransaction, createTransaction, iTransPayload} from '../repositories/transaction.repository';
 
 @Route('transactions')
@@ -16,7 +16,7 @@ export default class TransactionController {
   }
 
   @Post('/')
-  public async createTransaction(@Body() body: iTransPayload):Promise<Transaction> {
+  public async createTransaction(@Body() body: iTransPayload):Promise<Transaction | {errMsg: string} | null> {
     return createTransaction(body);
   }
 }
