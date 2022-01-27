@@ -22,4 +22,10 @@ router.post('/', async(req, res) => {
   return res.json(response);
 })
 
+router.put('/:id', async (req, res) => {
+  const ctrl = new TransCtrl();
+  const response = await ctrl.updateTransaction(req.params.id, req.body);
+  return res.json(response);
+})
+
 export default router;

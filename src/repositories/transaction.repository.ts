@@ -111,40 +111,81 @@ export const createTransaction = async (payload: iTransPayload): Promise<Transac
     // save transaction
     const savedTrans = await transRepo.save(transCreated);
 
-    // move file
-    const fileInTemp = payload.fileInTemp;
-    if (fileInTemp) {
-      const onlyFileNameInTemp = fileInTemp.substring(fileInTemp.indexOf(".") + 1);
-      const projectName = replaceInString(payload.project.name, '.', '_');
-      const vendorName = replaceInString(payload.vendor.name, '.', '_');
-      const amount = replaceInString(payload.amount, '.', '');
-      let newFileName = `${savedTrans.id}.${projectName}.${vendorName}.${amount}.${onlyFileNameInTemp}`
-        .trim().replace(/\s+/g, '_');
-      const fileRes = moveFile({
-        oldFolder: 'temp',
-        oldFile: fileInTemp,
-        newFolder: 't',
-        newFile: newFileName
-      });
-      if (fileRes.errMsg) return {errMsg: fileRes.errMsg}
-
-      // save document
-      await createDocument({
-        name: payload.fileName || onlyFileNameInTemp,
-        path: fileRes.path,
-        transactionId: savedTrans.id
-      })
-    }
+    // move/create file/document
+    await moveFileFromTempToUploads(savedTrans.id, payload);
 
     // get saved transaction from DB
-    const transToReturn = await getTransaction(savedTrans.id);
-    return transToReturn;
+    return await getTransaction(savedTrans.id);
 
   } catch (err) {
     console.error(err);
     return {errMsg: 'Problem in saving transaction!'};
   }
 };
+
+export const updateTransaction = async (id: number, payload: iTransPayload): Promise<Transaction | {errMsg: string} | null> => {
+  const transRepo = getRepository(Transaction);
+  if (!id) return {errMsg: 'Missing transaction ID'};
+  const trans: Transaction | undefined = await transRepo.findOne(id);
+  if (!trans) return {errMsg: 'Cannot find a transaction to edit'};
+
+  const t = transformTransaction(payload);
+  trans.name = t.name;
+  trans.amount = t.amount;
+  trans.relatedAmount = t.relatedAmount;
+  trans.date = t.date;
+  trans.relatedDate = t.relatedDate;
+  trans.nonTaxable = t.nonTaxable;
+  trans.notes = t.notes;
+  trans.accountId = t.accountId;
+  trans.categoryId = payload.categoryId;
+  trans.personId = payload.personId;
+  trans.projectId = payload.projectId;
+  trans.vendorId = payload.vendorId;
+  trans.updatedAt = new Date();
+
+  try {
+
+    // save
+    const savedTrans = await transRepo.save(trans);
+
+    // move file/document from temp to uploads
+    await moveFileFromTempToUploads(savedTrans.id, payload);
+
+    // return
+    return await getTransaction(savedTrans.id);
+
+  } catch (err) {
+    console.error(err);
+    return {errMsg: 'Error in editing transaction!'};
+  }
+}
+
+async function moveFileFromTempToUploads (transId: number, payload: iTransPayload) {
+  const fileInTemp = payload.fileInTemp;
+  if (fileInTemp) {
+    const onlyFileNameInTemp = fileInTemp.substring(fileInTemp.indexOf(".") + 1);
+    const projectName = replaceInString(payload.project.name, '.', '_');
+    const vendorName = replaceInString(payload.vendor.name, '.', '_');
+    const amount = replaceInString(payload.amount, '.', '');
+    let newFileName = `${transId}.${projectName}.${vendorName}.${amount}.${onlyFileNameInTemp}`
+      .trim().replace(/\s+/g, '_');
+    const fileRes = moveFile({
+      oldFolder: 'temp',
+      oldFile: fileInTemp,
+      newFolder: 't',
+      newFile: newFileName
+    });
+    if (fileRes.errMsg) return {errMsg: fileRes.errMsg}
+
+    // create document
+    await createDocument({
+      name: payload.fileName || onlyFileNameInTemp,
+      path: fileRes.path,
+      transactionId: transId
+    })
+  }
+}
 
 
 
