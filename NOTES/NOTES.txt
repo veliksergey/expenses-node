@@ -10,3 +10,6 @@ fuser 8008/tcp -k
 // use "typeorm" in package.json
 // example sync schemas with DB:
 npm run typeorm schema:sync
+
+// run ts files with node:
+ts-node filename.ts

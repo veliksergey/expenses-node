@@ -1,5 +1,5 @@
 import {getRepository, ILike} from 'typeorm';
-import {Transaction, Document} from '../models';
+import {Transaction} from '../models';
 import {moveFile} from '../functions/files';
 import {createDocument} from './document.repository';
 
@@ -29,7 +29,8 @@ export interface iTransPayload {
 }
 
 function prepareOrderByWay(orderBy: string, orderWay: string): any {
-  const allowedOrders: Array<string> = ['id', 'name'];
+  const allowedOrders: Array<string> = ['id', 'name', 'amount', 'date',];
+  orderBy = orderBy.toLowerCase();
   if (!allowedOrders.includes(orderBy)) orderBy = 'id';
   orderWay = orderWay.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
   return {[orderBy]: orderWay};
@@ -78,7 +79,7 @@ export const getTransactions = async (): Promise<any> => {
   }
 
   const [result, total] = await transRepo.findAndCount({
-    relations: ['account', 'category', 'person', 'project', 'vendor'],
+    relations: ['account', 'category', 'person', 'project', 'vendor', 'documents'],
     ...findOptions,
   });
 
@@ -89,7 +90,7 @@ export const getTransaction = async (id: number): Promise<Transaction | null> =>
   const transRepo = getRepository(Transaction);
   const trans = await transRepo.findOne({
     where: {id},
-    relations: ['account', 'category', 'person', 'project', 'vendor']
+    relations: ['account', 'category', 'person', 'project', 'vendor', 'documents']
   });
   if (!trans) return null;
   return trans;
