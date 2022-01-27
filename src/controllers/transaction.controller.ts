@@ -1,4 +1,4 @@
-import {Get, Post, Put, Route, Tags, Body, Path} from 'tsoa';
+import {Get, Post, Put, Route, Tags, Body, Path, Query} from 'tsoa';
 import {Transaction} from '../models';
 import {
   getTransactions,
@@ -12,8 +12,23 @@ import {
 @Tags('transaction')
 export default class TransactionController {
   @Get('/')
-  public async getTransactions(): Promise<{transactions: Array<Transaction>, transactionCount: number}> {
-    return getTransactions();
+  public async getTransactions(
+    @Query() page: string,
+    @Query() rowsPerPage: string,
+    @Query() sortBy: string,
+    @Query() descending: string,
+    @Query() filter: string,
+  ): Promise<{transactions: Array<Transaction>, transactionCount: number}> {
+
+    const params = {
+      page: +page || 1,
+      rowsPerPage: +rowsPerPage || 10,
+      sortBy: sortBy.trim() || 'date',
+      descending: !(descending === 'false'),
+      filter: filter.trim() || '',
+    };
+
+    return getTransactions(params);
   }
 
   @Get('/{id}')

@@ -1,4 +1,4 @@
-import {getRepository, ILike} from 'typeorm';
+import {getRepository, ILike, Raw} from 'typeorm';
 import {Transaction} from '../models';
 import {moveFile} from '../functions/files';
 import {createDocument} from './document.repository';
@@ -27,27 +27,27 @@ export interface iTransPayload {
   project: iItemPayload,
   vendor: iItemPayload,
 }
+interface queryPayload {page: number, rowsPerPage: number, sortBy: string, descending: boolean, filter: string};
 
-function prepareOrderByWay(orderBy: string, orderWay: string): any {
+function prepareOrderByWay(sortBy: string, descending: boolean): any {
   const allowedOrders: Array<string> = ['id', 'name', 'amount', 'date',];
-  orderBy = orderBy.toLowerCase();
-  if (!allowedOrders.includes(orderBy)) orderBy = 'id';
-  orderWay = orderWay.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-  return {[orderBy]: orderWay};
+  sortBy = sortBy.toLowerCase();
+  if (!allowedOrders.includes(sortBy)) sortBy = 'id';
+  const sortWay = descending ? 'DESC' : 'ASC';
+  return {[sortBy]: sortWay};
 }
 
 // ToDo: replace "any" with something better
 // export const getTransactions = async():Promise<{transactions: Array<Transaction>, transactionCount: number}> => {
-export const getTransactions = async (): Promise<any> => {
+export const getTransactions = async (payload: queryPayload): Promise<any> => {
   const transRepo = getRepository(Transaction);
 
-  const search: string = '';
-  const order = prepareOrderByWay('date', 'DESC');
-  const page: number = +'1';
-  const take: number = Number('10'); // limit
-  const skip: number = (page - 1) * take;
+  const search: string = payload.filter;
+  const order = prepareOrderByWay(payload.sortBy, payload.descending);
+  const take: number = payload.rowsPerPage; // limit
+  const skip: number = (payload.page - 1) * take;
 
-  // ToDo: search, pagination, etc
+  // ToDo: order by
   /*return await transRepo.find({relations: ['project']});
 
   const [transactions, transactionCount] = await transRepo
@@ -70,12 +70,19 @@ export const getTransactions = async (): Promise<any> => {
   let findOptions: any = {
     skip, take, order,
   };
-  if (search.trim()) {
+  if (search.trim().length) {
     findOptions.where = [
       {name: ILike(`%${search}%`)},
       {project: {name: ILike(`%${search}%`)}},
       {vendor: {name: ILike(`%${search}%`)}},
+      {account: {name: ILike(`%${search}%`)}},
+      {category: {name: ILike(`%${search}%`)}},
     ];
+    if (!isNaN(Number(search))) { // if search is number (for amount)
+      findOptions.where.push({
+        amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})
+      })
+    }
   }
 
   const [result, total] = await transRepo.findAndCount({
