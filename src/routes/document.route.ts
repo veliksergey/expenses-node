@@ -14,7 +14,6 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
 
   const folder = path.join(__dirname, '../../uploads/temp');
-  console.log('-- folder:', folder);
 
   const form = formidable({
     keepExtensions: true,

@@ -8,11 +8,11 @@ router.get('/', async(req, res) => {
 
   const page: string = (req.query.page || 1).toString();
   const rowsPerPage = (req.query.rowsPerPage || 10).toString();
-  const orderBy = (req.query.orderBy || 'date').toString();
+  const sortBy = (req.query.sortBy || 'date').toString();
   const descending = (req.query.descending || 'true').toString();
   const filter = (req.query.filter || '').toString();
 
-  const transactions = await ctrl.getTransactions(page, rowsPerPage, orderBy, descending, filter);
+  const transactions = await ctrl.getTransactions(page, rowsPerPage, sortBy, descending, filter);
   return res.json(transactions);
 });
 

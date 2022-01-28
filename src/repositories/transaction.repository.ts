@@ -29,7 +29,7 @@ export interface iTransPayload {
 }
 interface queryPayload {page: number, rowsPerPage: number, sortBy: string, descending: boolean, filter: string};
 
-function prepareOrderByWay(sortBy: string, descending: boolean): any {
+function prepareOrder(sortBy: string, descending: boolean): any {
   const allowedOrders: Array<string> = ['id', 'name', 'amount', 'date',];
   sortBy = sortBy.toLowerCase();
   if (!allowedOrders.includes(sortBy)) sortBy = 'id';
@@ -43,7 +43,7 @@ export const getTransactions = async (payload: queryPayload): Promise<any> => {
   const transRepo = getRepository(Transaction);
 
   const search: string = payload.filter;
-  const order = prepareOrderByWay(payload.sortBy, payload.descending);
+  const order = prepareOrder(payload.sortBy, payload.descending);
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;
 
