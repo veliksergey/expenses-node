@@ -20,6 +20,12 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({
+    type: 'smallint',
+    nullable: false,
+    default: 0})
+  type!: number // 0 = out, 1 = in
+
   // name
   @Column({
     length: 100,
@@ -62,7 +68,7 @@ export class Transaction {
     type: 'boolean',
     default: false,
   })
-  nonTaxable!: boolean
+  nonTaxable!: boolean;
 
   // notes
   @Column({
@@ -81,7 +87,7 @@ export class Transaction {
     onUpdate: 'CASCADE',
   })
   @JoinColumn()
-  account!: Account
+  account!: Account;
 
   // category
   @Column({nullable: true})
@@ -140,7 +146,7 @@ export class Transaction {
   // related transactions
   @ManyToMany(type => Transaction)
   @JoinTable()
-  related!: Array<Transaction>
+  related!: Array<Transaction>;
 
   // createdAt
   @CreateDateColumn({select: false})

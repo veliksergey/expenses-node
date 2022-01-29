@@ -22,7 +22,7 @@ export default class TransactionController {
 
     const params = {
       page: +page || 1,
-      rowsPerPage: +rowsPerPage || 10,
+      rowsPerPage: +rowsPerPage > -1 ? +rowsPerPage : 10,
       sortBy: sortBy.trim() || 'date',
       descending: !(descending === 'false'),
       filter: filter.trim() || '',

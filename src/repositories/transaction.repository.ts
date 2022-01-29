@@ -5,6 +5,7 @@ import {createDocument} from './document.repository';
 
 export interface iItemPayload {id: number, name: string};
 export interface iTransPayload {
+  type: number,
   name: string,
   amount: number,
   relatedAmount: number,
@@ -47,7 +48,6 @@ export const getTransactions = async (payload: queryPayload): Promise<any> => {
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;
 
-  // ToDo: order by
   /*return await transRepo.find({relations: ['project']});
 
   const [transactions, transactionCount] = await transRepo
@@ -137,6 +137,7 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
   if (!trans) return {errMsg: 'Cannot find a transaction to edit'};
 
   const t = transformTransaction(payload);
+  trans.type = t.type;
   trans.name = t.name;
   trans.amount = t.amount;
   trans.relatedAmount = t.relatedAmount;
@@ -199,12 +200,12 @@ async function moveFileFromTempToUploads (transId: number, payload: iTransPayloa
 // FUNCTIONS
 function transformTransaction(trans: iTransPayload) {
   const {
-    name, amount, relatedAmount, date, relatedDate, nonTaxable, notes, fileName, fileInTemp,
+    type, name, amount, relatedAmount, date, relatedDate, nonTaxable, notes, fileName, fileInTemp,
     accountId, categoryId, personId, projectId, vendorId,
     account, category, person, project, vendor
   } = trans;
   return {
-    name, amount, relatedAmount, date, relatedDate, nonTaxable, notes,
+    type, name, amount, relatedAmount, date, relatedDate, nonTaxable, notes,
     accountId, categoryId, personId, projectId, vendorId,
   };
 }

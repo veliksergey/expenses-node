@@ -13,3 +13,5 @@ npm run typeorm schema:sync
 
 // run ts files with node:
 ts-node filename.ts
+
+// ToDo: backup files in "uploads" folder
