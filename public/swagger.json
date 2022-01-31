@@ -25,7 +25,8 @@
 					},
 					"relatedAmount": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"nullable": true
 					},
 					"date": {
 						"type": "string",
@@ -33,9 +34,10 @@
 					},
 					"relatedDate": {
 						"type": "string",
-						"format": "date-time"
+						"format": "date-time",
+						"nullable": true
 					},
-					"nonTaxable": {
+					"taxable": {
 						"type": "boolean"
 					},
 					"notes": {
@@ -109,7 +111,7 @@
 					"relatedAmount",
 					"date",
 					"relatedDate",
-					"nonTaxable",
+					"taxable",
 					"notes",
 					"accountId",
 					"account",
@@ -316,7 +318,8 @@
 					},
 					"relatedAmount": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"nullable": true
 					},
 					"date": {
 						"type": "string",
@@ -324,9 +327,10 @@
 					},
 					"relatedDate": {
 						"type": "string",
-						"format": "date-time"
+						"format": "date-time",
+						"nullable": true
 					},
-					"nonTaxable": {
+					"taxable": {
 						"type": "boolean"
 					},
 					"notes": {
@@ -403,7 +407,7 @@
 					"relatedAmount",
 					"date",
 					"relatedDate",
-					"nonTaxable",
+					"taxable",
 					"notes",
 					"projectId",
 					"vendorId",

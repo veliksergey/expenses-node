@@ -2,16 +2,17 @@ import {getRepository, ILike, Raw} from 'typeorm';
 import {Transaction} from '../models';
 import {moveFile} from '../functions/files';
 import {createDocument} from './document.repository';
+import {createItem} from './item.repository';
 
 export interface iItemPayload {id: number, name: string};
 export interface iTransPayload {
   type: number,
   name: string,
   amount: number,
-  relatedAmount: number,
+  relatedAmount: number | null,
   date: Date,
-  relatedDate: Date,
-  nonTaxable: boolean,
+  relatedDate: Date | null,
+  taxable: boolean,
   notes: string,
   projectId: number,
   vendorId: number,
@@ -110,18 +111,24 @@ export const createTransaction = async (payload: iTransPayload): Promise<Transac
   const newTrans = new Transaction();
   const transCreated = transRepo.create({
     ...newTrans,
-    ...(transformTransaction(payload))
+    ...(await prepareTransactionForDB(payload))
   });
 
   try {
 
     // save transaction
     const savedTrans = await transRepo.save(transCreated);
+    console.log('*** savedTrans:', savedTrans);
 
     // move/create file/document
-    await moveFileFromTempToUploads(savedTrans.id, payload);
+    await moveFileFromTempToUploads(savedTrans.id, {
+      amount: savedTrans.amount,
+      fileInTemp: payload.fileInTemp,
+      fileName: payload.fileName,
+      projectName: (typeof payload.project === 'object') ? payload.project.name : payload.project,
+      vendorName: (typeof payload.vendor === 'object') ? payload.vendor.name : payload.vendor
+    });
 
-    // get saved transaction from DB
     return await getTransaction(savedTrans.id);
 
   } catch (err) {
@@ -136,14 +143,14 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
   const trans: Transaction | undefined = await transRepo.findOne(id);
   if (!trans) return {errMsg: 'Cannot find a transaction to edit'};
 
-  const t = transformTransaction(payload);
+  const t = await prepareTransactionForDB(payload);
   trans.type = t.type;
   trans.name = t.name;
   trans.amount = t.amount;
   trans.relatedAmount = t.relatedAmount;
   trans.date = t.date;
   trans.relatedDate = t.relatedDate;
-  trans.nonTaxable = t.nonTaxable;
+  trans.taxable = t.taxable;
   trans.notes = t.notes;
   trans.accountId = t.accountId;
   trans.categoryId = payload.categoryId;
@@ -158,7 +165,13 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
     const savedTrans = await transRepo.save(trans);
 
     // move file/document from temp to uploads
-    await moveFileFromTempToUploads(savedTrans.id, payload);
+    await moveFileFromTempToUploads(savedTrans.id, {
+      amount: savedTrans.amount,
+      fileInTemp: payload.fileInTemp,
+      fileName: payload.fileName,
+      projectName: (typeof payload.project === 'object') ? payload.project.name : payload.project,
+      vendorName: (typeof payload.vendor === 'object') ? payload.vendor.name : payload.vendor
+    });
 
     // return
     return await getTransaction(savedTrans.id);
@@ -169,12 +182,13 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
   }
 }
 
-async function moveFileFromTempToUploads (transId: number, payload: iTransPayload) {
+async function moveFileFromTempToUploads (transId: number, payload:
+    {fileInTemp: string, fileName: string, projectName: string, vendorName: string, amount: number}) {
   const fileInTemp = payload.fileInTemp;
   if (fileInTemp) {
     const onlyFileNameInTemp = fileInTemp.substring(fileInTemp.indexOf(".") + 1);
-    const projectName = replaceInString(payload.project.name, '.', '_');
-    const vendorName = replaceInString(payload.vendor.name, '.', '_');
+    const projectName = replaceInString(payload.projectName, '.', '_');
+    const vendorName = replaceInString(payload.vendorName, '.', '_');
     const amount = replaceInString(payload.amount, '.', '');
     let newFileName = `${transId}.${projectName}.${vendorName}.${amount}.${onlyFileNameInTemp}`
       .trim().replace(/\s+/g, '_');
@@ -198,14 +212,26 @@ async function moveFileFromTempToUploads (transId: number, payload: iTransPayloa
 
 
 // FUNCTIONS
-function transformTransaction(trans: iTransPayload) {
-  const {
-    type, name, amount, relatedAmount, date, relatedDate, nonTaxable, notes, fileName, fileInTemp,
-    accountId, categoryId, personId, projectId, vendorId,
-    account, category, person, project, vendor
-  } = trans;
+async function prepareTransactionForDB(trans: iTransPayload) {
+  let {
+    type, name, amount, relatedAmount, date, relatedDate, taxable, notes, fileName, fileInTemp,
+    // accountId, categoryId, personId, projectId, vendorId,
+    account, category, person, project, vendor} = trans;
+
+  let accountId = !account ? null : (typeof account === 'object') ? account.id : (await createItem('account', {name: account})).id;
+  let categoryId = !category ? null : (typeof category === 'object') ? category.id : (await createItem('category', {name: category})).id;
+  let personId = !person ? null : (typeof person === 'object') ? person.id : (await createItem('person', {name: person})).id;
+  const projectId = !project ? null : (typeof project === 'object') ? project.id : (await createItem('project', {name: project})).id;
+  const vendorId = !vendor ? null : (typeof vendor === 'object') ? vendor.id : (await createItem('vendor', {name: vendor})).id;
+
+  if (!relatedDate) relatedDate = null;
+  if (!relatedAmount) relatedAmount = null;
+  if (!accountId) accountId = null;
+  if (!categoryId) categoryId = null;
+  if (!personId) personId = null;
+
   return {
-    type, name, amount, relatedAmount, date, relatedDate, nonTaxable, notes,
+    type, name, amount, relatedAmount, date, relatedDate, taxable, notes,
     accountId, categoryId, personId, projectId, vendorId,
   };
 }

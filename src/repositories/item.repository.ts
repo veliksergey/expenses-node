@@ -6,25 +6,11 @@ export interface iItemPayload {
 }
 
 const getModel = (type: string) => {
-  let model;
-  switch (type) {
-    case 'accounts':
-      model = Account;
-      break;
-    case 'categories':
-      model = Category;
-      break;
-    case 'people':
-      model = Person;
-      break;
-    case 'projects':
-      model = Project;
-      break;
-    case 'vendors':
-      model = Vendor;
-      break;
-  }
-  return model;
+  if (type === 'account' || type === 'accounts') return Account;
+  if (type === 'category' || type === 'categories') return Category;
+  if (type === 'person' || type === 'people') return Person;
+  if (type === 'project' || type === 'projects') return Project;
+  if (type === 'vendor' || type === 'vendors') return Vendor;
 }
 
 const getItemRepo = (type: string) => {

@@ -47,7 +47,7 @@ export class Transaction {
     scale: 2,
     nullable: true,
   })
-  relatedAmount!: number;
+  relatedAmount!: number | null;
 
   // date
   @Column({
@@ -61,14 +61,15 @@ export class Transaction {
     type: 'date',
     nullable: true,
   })
-  relatedDate!: Date;
+  relatedDate!: Date | null;
 
-  // non taxable
+  // taxable
   @Column({
     type: 'boolean',
-    default: false,
+    nullable: false,
+    default: true,
   })
-  nonTaxable!: boolean;
+  taxable!: boolean;
 
   // notes
   @Column({
