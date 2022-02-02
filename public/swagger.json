@@ -37,9 +37,6 @@
 						"format": "date-time",
 						"nullable": true
 					},
-					"taxable": {
-						"type": "boolean"
-					},
 					"notes": {
 						"type": "string"
 					},
@@ -84,12 +81,6 @@
 						},
 						"type": "array"
 					},
-					"related": {
-						"items": {
-							"$ref": "#/components/schemas/Transaction"
-						},
-						"type": "array"
-					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time"
@@ -111,7 +102,6 @@
 					"relatedAmount",
 					"date",
 					"relatedDate",
-					"taxable",
 					"notes",
 					"accountId",
 					"account",
@@ -124,7 +114,6 @@
 					"vendorId",
 					"vendor",
 					"documents",
-					"related",
 					"createdAt",
 					"updatedAt"
 				],
@@ -330,31 +319,8 @@
 						"format": "date-time",
 						"nullable": true
 					},
-					"taxable": {
-						"type": "boolean"
-					},
 					"notes": {
 						"type": "string"
-					},
-					"projectId": {
-						"type": "number",
-						"format": "double"
-					},
-					"vendorId": {
-						"type": "number",
-						"format": "double"
-					},
-					"accountId": {
-						"type": "number",
-						"format": "double"
-					},
-					"personId": {
-						"type": "number",
-						"format": "double"
-					},
-					"categoryId": {
-						"type": "number",
-						"format": "double"
 					},
 					"documents": {
 						"items": {
@@ -374,10 +340,6 @@
 						},
 						"type": "array"
 					},
-					"related": {
-						"items": {},
-						"type": "array"
-					},
 					"fileName": {
 						"type": "string"
 					},
@@ -385,19 +347,74 @@
 						"type": "string"
 					},
 					"account": {
-						"$ref": "#/components/schemas/iItemPayload"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/iItemPayload"
+							},
+							{
+								"type": "string"
+							}
+						]
 					},
 					"category": {
-						"$ref": "#/components/schemas/iItemPayload"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/iItemPayload"
+							},
+							{
+								"type": "string"
+							}
+						]
 					},
 					"person": {
-						"$ref": "#/components/schemas/iItemPayload"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/iItemPayload"
+							},
+							{
+								"type": "string"
+							}
+						]
 					},
 					"project": {
-						"$ref": "#/components/schemas/iItemPayload"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/iItemPayload"
+							},
+							{
+								"type": "string"
+							}
+						]
 					},
 					"vendor": {
-						"$ref": "#/components/schemas/iItemPayload"
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/iItemPayload"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"accountId": {
+						"type": "number",
+						"format": "double"
+					},
+					"categoryId": {
+						"type": "number",
+						"format": "double"
+					},
+					"personId": {
+						"type": "number",
+						"format": "double"
+					},
+					"projectId": {
+						"type": "number",
+						"format": "double"
+					},
+					"vendorId": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
@@ -407,22 +424,20 @@
 					"relatedAmount",
 					"date",
 					"relatedDate",
-					"taxable",
 					"notes",
-					"projectId",
-					"vendorId",
-					"accountId",
-					"personId",
-					"categoryId",
 					"documents",
-					"related",
 					"fileName",
 					"fileInTemp",
 					"account",
 					"category",
 					"person",
 					"project",
-					"vendor"
+					"vendor",
+					"accountId",
+					"categoryId",
+					"personId",
+					"projectId",
+					"vendorId"
 				],
 				"type": "object",
 				"additionalProperties": false

@@ -1,5 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column, Index, ManyToOne, JoinColumn} from 'typeorm';
-import {Transaction} from './transaction';
+import {Transaction} from './index';
 
 @Entity()
 export class Document {

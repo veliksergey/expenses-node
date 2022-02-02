@@ -12,24 +12,28 @@ export interface iTransPayload {
   relatedAmount: number | null,
   date: Date,
   relatedDate: Date | null,
-  taxable: boolean,
   notes: string,
-  projectId: number,
-  vendorId: number,
-  accountId: number,
-  personId: number,
-  categoryId: number,
   documents: Array<{ name: string, path: string }>,
-  related: Array<any>,
   fileName: string,
   fileInTemp: string,
-  account: iItemPayload,
-  category: iItemPayload,
-  person: iItemPayload,
-  project: iItemPayload,
-  vendor: iItemPayload,
+  account: iItemPayload | string,
+  category: iItemPayload | string,
+  person: iItemPayload | string,
+  project: iItemPayload | string,
+  vendor: iItemPayload | string,
+  accountId: number,
+  categoryId: number,
+  personId: number,
+  projectId: number,
+  vendorId: number,
 }
-interface queryPayload {page: number, rowsPerPage: number, sortBy: string, descending: boolean, filter: string};
+interface iQueryPayload {
+  page: number,
+  rowsPerPage: number,
+  sortBy: string,
+  descending: boolean,
+  filter: string
+}
 
 function prepareOrder(sortBy: string, descending: boolean): any {
   const allowedOrders: Array<string> = ['id', 'name', 'amount', 'date',];
@@ -41,7 +45,7 @@ function prepareOrder(sortBy: string, descending: boolean): any {
 
 // ToDo: replace "any" with something better
 // export const getTransactions = async():Promise<{transactions: Array<Transaction>, transactionCount: number}> => {
-export const getTransactions = async (payload: queryPayload): Promise<any> => {
+export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
   const transRepo = getRepository(Transaction);
 
   const search: string = payload.filter;
@@ -49,28 +53,8 @@ export const getTransactions = async (payload: queryPayload): Promise<any> => {
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;
 
-  /*return await transRepo.find({relations: ['project']});
+  let findOptions: any = {skip, take, order,};
 
-  const [transactions, transactionCount] = await transRepo
-    .findAndCount({relations: ['related']});
-
-  return {transactions, transactionCount};
-
-  const trans = await transRepo
-    .createQueryBuilder('t')
-    // .select(['t.id', 't.name', 't.amount', 't.date', 't.notes'])
-    .leftJoinAndSelect('t.project', 'project')
-    .leftJoinAndSelect('t.vendor', 'vendor')
-    // .leftJoinAndSelect('t.related', 'transaction')
-    .skip(skip) // pagination
-    .take(take)
-    .maxExecutionTime(5000) // limit of execution time to avoid a server crashing
-    .printSql() // for debugging
-    .getMany();*/
-
-  let findOptions: any = {
-    skip, take, order,
-  };
   if (search.trim().length) {
     findOptions.where = [
       {name: ILike(`%${search}%`)},
@@ -79,7 +63,7 @@ export const getTransactions = async (payload: queryPayload): Promise<any> => {
       {account: {name: ILike(`%${search}%`)}},
       {category: {name: ILike(`%${search}%`)}},
     ];
-    if (!isNaN(Number(search))) { // if search is number (for amount)
+    if (!isNaN(Number(search))) { // if number -> search in amounts
       findOptions.where.push({
         amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})
       })
@@ -90,6 +74,9 @@ export const getTransactions = async (payload: queryPayload): Promise<any> => {
     relations: ['account', 'category', 'person', 'project', 'vendor', 'documents'],
     ...findOptions,
   });
+
+  console.log(JSON.stringify(result));
+  console.log(total);
 
   return {result, total};
 };
@@ -111,7 +98,7 @@ export const createTransaction = async (payload: iTransPayload): Promise<Transac
   const newTrans = new Transaction();
   const transCreated = transRepo.create({
     ...newTrans,
-    ...(await prepareTransactionForDB(payload))
+    ...(await prepareTransactionForDB(payload)),
   });
 
   try {
@@ -150,7 +137,6 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
   trans.relatedAmount = t.relatedAmount;
   trans.date = t.date;
   trans.relatedDate = t.relatedDate;
-  trans.taxable = t.taxable;
   trans.notes = t.notes;
   trans.accountId = t.accountId;
   trans.categoryId = payload.categoryId;
@@ -214,24 +200,26 @@ async function moveFileFromTempToUploads (transId: number, payload:
 // FUNCTIONS
 async function prepareTransactionForDB(trans: iTransPayload) {
   let {
-    type, name, amount, relatedAmount, date, relatedDate, taxable, notes, fileName, fileInTemp,
+    type, name, amount, relatedAmount, date, relatedDate, notes, fileName, fileInTemp,
     // accountId, categoryId, personId, projectId, vendorId,
     account, category, person, project, vendor} = trans;
 
   let accountId = !account ? null : (typeof account === 'object') ? account.id : (await createItem('account', {name: account})).id;
   let categoryId = !category ? null : (typeof category === 'object') ? category.id : (await createItem('category', {name: category})).id;
   let personId = !person ? null : (typeof person === 'object') ? person.id : (await createItem('person', {name: person})).id;
-  const projectId = !project ? null : (typeof project === 'object') ? project.id : (await createItem('project', {name: project})).id;
-  const vendorId = !vendor ? null : (typeof vendor === 'object') ? vendor.id : (await createItem('vendor', {name: vendor})).id;
+  let projectId = !project ? null : (typeof project === 'object') ? project.id : (await createItem('project', {name: project})).id;
+  let vendorId = !vendor ? null : (typeof vendor === 'object') ? vendor.id : (await createItem('vendor', {name: vendor})).id;
 
   if (!relatedDate) relatedDate = null;
   if (!relatedAmount) relatedAmount = null;
   if (!accountId) accountId = null;
   if (!categoryId) categoryId = null;
   if (!personId) personId = null;
+  if (!projectId) projectId = null;
+  if (!vendorId) vendorId = null;
 
   return {
-    type, name, amount, relatedAmount, date, relatedDate, taxable, notes,
+    type, name, amount, relatedAmount, date, relatedDate, notes,
     accountId, categoryId, personId, projectId, vendorId,
   };
 }

@@ -8,8 +8,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
-  ManyToMany,
-  JoinTable, OneToMany
+  OneToMany
 } from 'typeorm';
 import {Project, Vendor, Account, Person, Category, Document} from './index';
 
@@ -20,15 +19,18 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  // type
   @Column({
     type: 'smallint',
     nullable: false,
-    default: 0})
+    default: 0
+  })
   type!: number // 0 = out, 1 = in
 
   // name
   @Column({
     length: 100,
+    nullable: true,
   })
   name!: string;
 
@@ -36,7 +38,8 @@ export class Transaction {
   @Column({
     type: 'decimal',
     precision: 10,
-    scale: 2
+    scale: 2,
+    nullable: false,
   })
   amount!: number;
 
@@ -63,14 +66,6 @@ export class Transaction {
   })
   relatedDate!: Date | null;
 
-  // taxable
-  @Column({
-    type: 'boolean',
-    nullable: false,
-    default: true,
-  })
-  taxable!: boolean;
-
   // notes
   @Column({
     type: 'text',
@@ -84,6 +79,7 @@ export class Transaction {
   accountId!: number;
   @ManyToOne(type => Account, (account: Account) => account.transactions, {
     // eager: true,
+    nullable: true,
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
@@ -117,11 +113,12 @@ export class Transaction {
   person!: Person;
 
   // project
-  @Column()
+  @Column({nullable: true})
   @Index()
   projectId!: number;
   @ManyToOne(type => Project, (project: Project) => project.transactions, {
     // eager: true,
+    nullable: true,
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
@@ -129,11 +126,12 @@ export class Transaction {
   project!: Project;
 
   // vendor
-  @Column()
+  @Column({nullable: true})
   @Index()
   vendorId!: number;
   @ManyToOne(type => Vendor, (vendor: Vendor) => vendor.transactions, {
     // eager: true,
+    nullable: true,
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
@@ -143,11 +141,6 @@ export class Transaction {
   // documents (receipts, invoices)
   @OneToMany(type => Document, (document: Document) => document.transaction)
   documents!: Array<Document>;
-
-  // related transactions
-  @ManyToMany(type => Transaction)
-  @JoinTable()
-  related!: Array<Transaction>;
 
   // createdAt
   @CreateDateColumn({select: false})

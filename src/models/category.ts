@@ -1,5 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Index} from 'typeorm';
-import {Transaction} from './transaction';
+import {Transaction} from './index';
 
 export enum CatType {
   ALL = 0,

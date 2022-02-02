@@ -1,6 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Index} from 'typeorm';
-// import {Transaction} from './index';
-import {Transaction} from './transaction';
+import {Transaction} from './index';
 
 @Entity()
 export class Vendor {
