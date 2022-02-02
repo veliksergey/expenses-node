@@ -10,9 +10,9 @@ router.get('/', async(req, res) => {
   const rowsPerPage = (req.query.rowsPerPage || 10).toString();
   const sortBy = (req.query.sortBy || 'date').toString();
   const descending = (req.query.descending || 'true').toString();
-  const filter = (req.query.filter || '').toString();
+  const search = (req.query.search || '').toString();
 
-  const transactions = await ctrl.getTransactions(page, rowsPerPage, sortBy, descending, filter);
+  const transactions = await ctrl.getTransactions(page, rowsPerPage, sortBy, descending, search);
   return res.json(transactions);
 });
 

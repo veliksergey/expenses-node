@@ -32,7 +32,7 @@ interface iQueryPayload {
   rowsPerPage: number,
   sortBy: string,
   descending: boolean,
-  filter: string
+  search: string
 }
 
 function prepareOrder(sortBy: string, descending: boolean): any {
@@ -48,7 +48,7 @@ function prepareOrder(sortBy: string, descending: boolean): any {
 export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
   const transRepo = getRepository(Transaction);
 
-  const search: string = payload.filter;
+  const search: string = payload.search;
   const order = prepareOrder(payload.sortBy, payload.descending);
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;

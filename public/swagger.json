@@ -525,7 +525,7 @@
 					},
 					{
 						"in": "query",
-						"name": "filter",
+						"name": "search",
 						"required": true,
 						"schema": {
 							"type": "string"

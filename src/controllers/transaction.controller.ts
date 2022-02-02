@@ -17,7 +17,7 @@ export default class TransactionController {
     @Query() rowsPerPage: string,
     @Query() sortBy: string,
     @Query() descending: string,
-    @Query() filter: string,
+    @Query() search: string,
   ): Promise<{transactions: Array<Transaction>, transactionCount: number}> {
 
     const params = {
@@ -25,7 +25,7 @@ export default class TransactionController {
       rowsPerPage: +rowsPerPage > -1 ? +rowsPerPage : 10,
       sortBy: sortBy.trim() || 'date',
       descending: !(descending === 'false'),
-      filter: filter.trim() || '',
+      search: search.trim() || '',
     };
 
     return getTransactions(params);
