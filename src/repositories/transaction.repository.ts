@@ -1,8 +1,10 @@
-import {getRepository, ILike, Raw} from 'typeorm';
+import {getRepository, ILike, Raw, Not} from 'typeorm';
 import {Transaction} from '../models';
 import {moveFile} from '../functions/files';
 import {createDocument} from './document.repository';
 import {createItem} from './item.repository';
+
+const relationTables = ['account', 'category', 'person', 'project', 'vendor', 'documents'];
 
 export interface iItemPayload {id: number, name: string};
 export interface iTransPayload {
@@ -71,21 +73,38 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
   }
 
   const [result, total] = await transRepo.findAndCount({
-    relations: ['account', 'category', 'person', 'project', 'vendor', 'documents'],
+    relations: relationTables,
     ...findOptions,
   });
 
-  console.log(JSON.stringify(result));
-  console.log(total);
-
   return {result, total};
 };
+
+export const getPossibleDuplicates = async ({date, amount, id}: {date: string, amount: string, id: string}): Promise<{result: Array<Transaction>, total: number}> => {
+  const transRepo = getRepository(Transaction);
+
+  const where: any = {
+    // date: Raw((alias) => `EXTRACT (YEAR FROM ${alias}) = '${year}' AND EXTRACT (MONTH FROM ${alias}) = '${month}'`),
+    date,
+    amount,
+  };
+  if (id && id !== 'null' && id !== 'undefined') {
+    where.id = Not(+id);
+  }
+
+  const [result, total] = await transRepo.findAndCount({
+    relations: relationTables,
+    where,
+  });
+
+  return {result, total};
+}
 
 export const getTransaction = async (id: number): Promise<Transaction | null> => {
   const transRepo = getRepository(Transaction);
   const trans = await transRepo.findOne({
     where: {id},
-    relations: ['account', 'category', 'person', 'project', 'vendor', 'documents']
+    relations: relationTables
   });
   if (!trans) return null;
   return trans;
@@ -105,7 +124,6 @@ export const createTransaction = async (payload: iTransPayload): Promise<Transac
 
     // save transaction
     const savedTrans = await transRepo.save(transCreated);
-    console.log('*** savedTrans:', savedTrans);
 
     // move/create file/document
     await moveFileFromTempToUploads(savedTrans.id, {

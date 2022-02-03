@@ -5,12 +5,14 @@ import {
   getTransaction,
   createTransaction,
   iTransPayload,
-  updateTransaction
+  updateTransaction,
+  getPossibleDuplicates,
 } from '../repositories/transaction.repository';
 
 @Route('transactions')
 @Tags('transaction')
 export default class TransactionController {
+
   @Get('/')
   public async getTransactions(
     @Query() page: string,
@@ -31,6 +33,15 @@ export default class TransactionController {
     return getTransactions(params);
   }
 
+  @Get('/duplicates')
+  public async getPossibleDuplicates(
+    @Query() date: string,
+    @Query() amount: string,
+    @Query() id: string
+  ): Promise<{result: Array<Transaction>, total: number}> {
+    return getPossibleDuplicates({date, amount, id});
+  }
+
   @Get('/{id}')
   public async getTransaction(@Path() id: string):Promise<Transaction | null> {
     return getTransaction(Number(id));
@@ -45,4 +56,5 @@ export default class TransactionController {
   public async updateTransaction(@Path() id: string, @Body() body: iTransPayload): Promise<Transaction | null | {errMsg: string}> {
     return updateTransaction(Number(id), body);
   }
+
 }

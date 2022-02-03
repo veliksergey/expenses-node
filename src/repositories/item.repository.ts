@@ -86,7 +86,6 @@ export const updateItem = async (type: string, id: number, payload: iItemPayload
 
   return itemRepo.save(item)
     .then(savedItem => {
-      console.log('-- savedItem:', savedItem);
       return savedItem;
     })
     .catch(err => {

@@ -41,11 +41,10 @@ app.use(express.static(uploadDir));
 app.use(Router);
 
 createConnection(dbConfig).then(connection => {
-  // console.log('-- connection:', connection);
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
 }).catch(err => {
-  console.log('Unable to connect to db', err);
+  console.error('Unable to connect to db', err);
   process.exit(1);
 });

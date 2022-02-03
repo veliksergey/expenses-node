@@ -16,6 +16,19 @@ router.get('/', async(req, res) => {
   return res.json(transactions);
 });
 
+router.get('/duplicates', async (req, res) => {
+  const ctrl = new TransCtrl();
+
+  const date = (req.query.date || '').toString();
+  const amount = (req.query.amount || '').toString();
+  const id = (req.query.id || '').toString();
+
+  if (!date || !amount) return res.json({errMsg: 'Missing some parameters'});
+
+  const transactions = await ctrl.getPossibleDuplicates(date, amount, id);
+  return res.json(transactions);
+});
+
 router.get('/:id', async (req, res) => {
   const ctrl = new TransCtrl();
   const response = await ctrl.getTransaction(req.params.id);
