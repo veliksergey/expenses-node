@@ -157,10 +157,10 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
   trans.relatedDate = t.relatedDate;
   trans.notes = t.notes;
   trans.accountId = t.accountId;
-  trans.categoryId = payload.categoryId;
-  trans.personId = payload.personId;
-  trans.projectId = payload.projectId;
-  trans.vendorId = payload.vendorId;
+  trans.categoryId = t.categoryId;
+  trans.personId = t.personId;
+  trans.projectId = t.projectId;
+  trans.vendorId = t.vendorId;
   trans.updatedAt = new Date();
 
   try {
