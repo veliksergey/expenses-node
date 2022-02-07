@@ -14,13 +14,13 @@ const tables = ['account', 'category', 'person', 'project', 'vendor', 'transacti
 const backupPath = path.join(__dirname, 'backups');
 if (!fs.existsSync(backupPath)) {
   fs.mkdirSync(backupPath);
-  console.log(`Created "backups" folder`);
+  console.log(`-- Created "backups" folder`);
 }
 
 // create DB connection
 createConnection(dbConfig)
 .then(async conn => {
-  console.log('Connection established');
+  console.log('-- Connection established');
 
   // repo promises
   const repoPromises: any = [];
@@ -50,30 +50,30 @@ createConnection(dbConfig)
   const folderPath = path.join(__dirname, 'backups', date);
   if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath);
-    console.log(`Created folder "${date}" in "backups"`);
+    console.log(`-- Created folder "${date}" in "backups"`);
   }
 
   // write EXCEL file
   const excelFileName = `${time}.xlsx`;
   const excelFilePath = path.join(folderPath, excelFileName);
   XLSX.writeFile(workBook, excelFilePath);
-  // console.log(`Created file "${excelFileName}" in "backups/${date}"`);
-  console.log('EXCEL file created');
+  // console.log(`-- Created file "${excelFileName}" in "backups/${date}"`);
+  console.log('-- EXCEL file created');
 
   // write JSON file
   const jsonFileName = `${time}.json`;
   const jsonFilePath = path.join(folderPath, jsonFileName);
   fs.writeFileSync(jsonFilePath, JSON.stringify(jsonObj));
-  // console.log(`Created file "${jsonFileName}" in "backups/${date}"`);
-  console.log('JSON file created');
+  // console.log(`-- Created file "${jsonFileName}" in "backups/${date}"`);
+  console.log('-- JSON file created');
 
   // dump the whole DB
   shell.exec(`PGPASSWORD="postgres" pg_dump --file "${folderPath}/DB_BACKUP" --format=c --blobs --host localhost --user postgres --encoding "UTF8" "expenses"`);
-  console.log('DB backup (dump) completed');
+  console.log('-- DB backup (dump) completed');
 
   // copy "uploads" to "backups"
   copyFolderRecursiveSync('../uploads', folderPath);
-  console.log('Copied "uploads" folder');
+  console.log('-- Copied "uploads" folder');
 
   // zip "backups" folder
   const zipFolderName = `EXPENSES_BACKUP_FILES_${date}_${time}.zip`;
@@ -82,24 +82,24 @@ createConnection(dbConfig)
   const archive = archiver('zip', {zlib: {level: 9}});
   output.on('close', () => {
 
-    console.log(`Created ZIP folder weights ${archive.pointer()} bytes`);
+    console.log(`-- Created ZIP folder weights ${archive.pointer()} bytes`);
 
     // move zip folder to Documents
     let documentPath = '/home/serqio/Documents';
     const finalFolder = path.join(documentPath, 'BACKUPS')
     if (!fs.existsSync(finalFolder)) {
       fs.mkdirSync(finalFolder);
-      console.log(`Created dir "${finalFolder}"`);
+      console.log(`-- Created dir "${finalFolder}"`);
     }
     const finalPath = path.join(finalFolder, zipFolderName);
     fs.renameSync(zipPath, finalPath);
-    console.log('Moved ZIP folder to Documents');
+    console.log('-- Moved ZIP folder to Documents');
 
     // delete "backups" folder
     fs.rmdirSync(backupPath, {recursive: true});
-    console.log('Deleted "backups" folder');
+    console.log('-- Deleted "backups" folder');
 
-    console.log('DONE');
+    console.log('-- DONE');
 
     // exit the script
     process.exit(1);
