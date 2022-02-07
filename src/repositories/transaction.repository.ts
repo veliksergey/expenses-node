@@ -83,13 +83,13 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
 export const getPossibleDuplicates = async ({date, amount, id}: {date: string, amount: string, id: string}): Promise<{result: Array<Transaction>, total: number}> => {
   const transRepo = getRepository(Transaction);
 
-  const where: any = {
-    // date: Raw((alias) => `EXTRACT (YEAR FROM ${alias}) = '${year}' AND EXTRACT (MONTH FROM ${alias}) = '${month}'`),
-    date,
-    amount,
-  };
+  // date: Raw((alias) => `EXTRACT (YEAR FROM ${alias}) = '${year}' AND EXTRACT (MONTH FROM ${alias}) = '${month}'`),
+  const where: any = [
+    {date, amount, id: Not(id)},
+    {relatedDate: date, amount, id: Not(id)}
+  ];
   if (id && id !== 'null' && id !== 'undefined') {
-    where.id = Not(+id);
+    where.forEach((wh: any) => wh.id = Not(+id));
   }
 
   const [result, total] = await transRepo.findAndCount({
