@@ -20,6 +20,7 @@ export default class TransactionController {
     @Query() sortBy: string,
     @Query() descending: string,
     @Query() search: string,
+    @Query() filters: string,
   ): Promise<{transactions: Array<Transaction>, transactionCount: number}> {
 
     const params = {
@@ -28,6 +29,7 @@ export default class TransactionController {
       sortBy: sortBy.trim() || 'date',
       descending: !(descending === 'false'),
       search: search.trim() || '',
+      filters: filters || '{}'
     };
 
     return getTransactions(params);
@@ -36,10 +38,12 @@ export default class TransactionController {
   @Get('/duplicates')
   public async getPossibleDuplicates(
     @Query() date: string,
+    @Query() relatedDate: string,
     @Query() amount: string,
+    @Query() relatedAmount: string,
     @Query() id: string
   ): Promise<{result: Array<Transaction>, total: number}> {
-    return getPossibleDuplicates({date, amount, id});
+    return getPossibleDuplicates({date, relatedDate, amount, relatedAmount, id});
   }
 
   @Get('/{id}')

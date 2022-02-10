@@ -34,7 +34,8 @@ interface iQueryPayload {
   rowsPerPage: number,
   sortBy: string,
   descending: boolean,
-  search: string
+  search: string,
+  filters: string,
 }
 
 function prepareOrder(sortBy: string, descending: boolean): any {
@@ -42,7 +43,9 @@ function prepareOrder(sortBy: string, descending: boolean): any {
   sortBy = sortBy.toLowerCase();
   if (!allowedOrders.includes(sortBy)) sortBy = 'id';
   const sortWay = descending ? 'DESC' : 'ASC';
-  return {[sortBy]: sortWay};
+  const order = {[sortBy]: sortWay};
+  if (sortBy !== 'id') order.id = 'DESC';
+  return order;
 }
 
 // ToDo: replace "any" with something better
@@ -54,47 +57,84 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
   const order = prepareOrder(payload.sortBy, payload.descending);
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;
+  const filters: { accountId: number, categoryId: number, personId: number, projectId: number, vendorId: number, date: string, type: number } = JSON.parse(payload.filters);
 
   let findOptions: any = {skip, take, order,};
-
-  if (search.trim().length) {
-    findOptions.where = [
-      {name: ILike(`%${search}%`)},
-      {project: {name: ILike(`%${search}%`)}},
-      {vendor: {name: ILike(`%${search}%`)}},
-      {account: {name: ILike(`%${search}%`)}},
-      {category: {name: ILike(`%${search}%`)}},
-    ];
-    if (!isNaN(Number(search))) { // if number -> search in amounts
-      findOptions.where.push({
-        amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})
-      })
-    }
-  }
 
   const [result, total] = await transRepo.findAndCount({
     relations: relationTables,
     ...findOptions,
+    where: ((qb: any) => {
+      qb.where({deletedAt: null})
+
+      // search
+      if (search.trim().length) {
+        qb.andWhere((qq: any) => {
+          qq.where([
+            {name: ILike(`%${search}%`)},
+            {project: {name: ILike(`%${search}%`)}},
+            {vendor: {name: ILike(`%${search}%`)}},
+            {account: {name: ILike(`%${search}%`)}},
+            {category: {name: ILike(`%${search}%`)}},
+          ]);
+          if (!isNaN(Number(search))) { // if number -> search in amounts
+            qq.orWhere({amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})})
+          }
+        });
+      }
+
+      // filters
+      if (filters && Object.keys(filters).length) {
+        if (filters.accountId) qb.andWhere({accountId: filters.accountId});
+        if (filters.categoryId) qb.andWhere({categoryId: filters.categoryId});
+        if (filters.personId) qb.andWhere({personId: filters.personId});
+        if (filters.projectId) qb.andWhere({projectId: filters.projectId});
+        if (filters.vendorId) qb.andWhere({vendorId: filters.vendorId});
+        if (filters.type) qb.andWhere({type: filters.type});
+        if (filters.date) qb.andWhere({date: filters.date});
+      }
+
+    }),
   });
 
   return {result, total};
 };
 
-export const getPossibleDuplicates = async ({date, amount, id}: {date: string, amount: string, id: string}): Promise<{result: Array<Transaction>, total: number}> => {
+export const getPossibleDuplicates = async ({date, relatedDate, amount, relatedAmount, id}
+                                            : {date: string, relatedDate: string, amount: string, relatedAmount: string, id: string}): Promise<{result: Array<Transaction>, total: number}> => {
   const transRepo = getRepository(Transaction);
 
   // date: Raw((alias) => `EXTRACT (YEAR FROM ${alias}) = '${year}' AND EXTRACT (MONTH FROM ${alias}) = '${month}'`),
-  const where: any = [
-    {date, amount, id: Not(id)},
-    {relatedDate: date, amount, id: Not(id)}
+  /*const where: any = [
+    {date, amount},
+    {date, amount: relatedAmount},
+    {date: relatedDate, amount: relatedAmount},
+    {relatedDate: date, amount},
+    {relatedDate: date, amount: relatedAmount},
+    {relatedDate: date, relatedAmount: relatedAmount},
   ];
   if (id && id !== 'null' && id !== 'undefined') {
     where.forEach((wh: any) => wh.id = Not(+id));
+  }*/
+
+  const whereObj: any= {date, amount};
+  let whereDate = `"date" = :date OR "relatedDate" = :date`;
+  if (relatedDate) {
+    whereDate += ` OR "date" = :relatedDate OR "relatedDate" = :relatedDate`;
+    whereObj.relatedDate = relatedDate;
+  }
+  let whereAmount = `"amount" = :amount OR "relatedAmount" = :amount`;
+  if (relatedAmount) {
+    whereAmount += ` OR "amount" = :relatedAmount OR "relatedAmount" = :relatedAmount`;
+    whereObj.relatedAmount = relatedAmount;
   }
 
   const [result, total] = await transRepo.findAndCount({
     relations: relationTables,
-    where,
+    // where,
+    where: ((qb: any) => {
+      qb.where(`(${whereDate}) AND (${whereAmount})`, whereObj)
+    })
   });
 
   return {result, total};
