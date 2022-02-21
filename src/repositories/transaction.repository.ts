@@ -39,6 +39,7 @@ interface iQueryPayload {
 }
 
 function prepareOrder(sortBy: string, descending: boolean): any {
+  // return {project: {name: 'ASC'}};
   const allowedOrders: Array<string> = ['id', 'name', 'amount', 'date',];
   sortBy = sortBy.toLowerCase();
   if (!allowedOrders.includes(sortBy)) sortBy = 'id';
@@ -72,13 +73,17 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
         qb.andWhere((qq: any) => {
           qq.where([
             {name: ILike(`%${search}%`)},
+            {notes: ILike(`%${search}%`)},
             {project: {name: ILike(`%${search}%`)}},
             {vendor: {name: ILike(`%${search}%`)}},
             {account: {name: ILike(`%${search}%`)}},
             {category: {name: ILike(`%${search}%`)}},
+            {person: {name: ILike(`%${search}%`)}},
           ]);
           if (!isNaN(Number(search))) { // if number -> search in amounts
-            qq.orWhere({amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})})
+            // if (search.indexOf('.') === -1) qq.orWhere({id: search});
+            qq.orWhere({amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})});
+            qq.orWhere({relatedAmount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})});
           }
         });
       }

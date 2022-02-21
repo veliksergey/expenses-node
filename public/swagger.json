@@ -530,6 +530,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "filters",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			},
@@ -578,6 +586,85 @@
 						}
 					}
 				}
+			}
+		},
+		"/transactions/duplicates": {
+			"get": {
+				"operationId": "GetPossibleDuplicates",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"total": {
+											"type": "number",
+											"format": "double"
+										},
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/Transaction"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"total",
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"transaction"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "date",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "relatedDate",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "relatedAmount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/transactions/{id}": {
