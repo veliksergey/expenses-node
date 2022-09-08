@@ -2,6 +2,7 @@ import express from 'express';
 import TransRouter from './transaction.router';
 import ItemRouter from './item.route';
 import DocRouter from './document.route';
+import ReportRouter from './report.router';
 
 // import ProjectRouter from './project.router';
 // import VendorRouter from './vendor.route';
@@ -14,6 +15,7 @@ const router = express.Router();
 router.use('/transactions', TransRouter);
 router.use('/items', ItemRouter);
 router.use('/documents', DocRouter);
+router.use('/report', ReportRouter);
 
 // router.use('/projects', ProjectRouter);
 // router.use('/vendors', VendorRouter);

@@ -40,6 +40,15 @@
 					"notes": {
 						"type": "string"
 					},
+					"reportCondition": {
+						"type": "boolean"
+					},
+					"condition1": {
+						"type": "boolean"
+					},
+					"condition2": {
+						"type": "boolean"
+					},
 					"accountId": {
 						"type": "number",
 						"format": "double"
@@ -103,6 +112,9 @@
 					"date",
 					"relatedDate",
 					"notes",
+					"reportCondition",
+					"condition1",
+					"condition2",
 					"accountId",
 					"account",
 					"categoryId",
@@ -1084,6 +1096,80 @@
 						}
 					}
 				}
+			}
+		},
+		"/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Transaction"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"report"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accountId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "categoryId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "personId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "projectId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "vendorId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "groupBy",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},

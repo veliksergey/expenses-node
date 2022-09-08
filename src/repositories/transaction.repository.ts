@@ -67,6 +67,7 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
     ...findOptions,
     where: ((qb: any) => {
       qb.where({deletedAt: null})
+      // qb.andWhere({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = '2021'`)});
 
       // search
       if (search.trim().length) {
@@ -82,8 +83,17 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
           ]);
           if (!isNaN(Number(search))) { // if number -> search in amounts
             // if (search.indexOf('.') === -1) qq.orWhere({id: search});
-            qq.orWhere({amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})});
-            qq.orWhere({relatedAmount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${search}%`})});
+            const searchWithDot = +search / 100;
+            qq.orWhere({amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa OR CAST(${alias} AS TEXT) LIKE :sw`, {sa: `${search}%`, sw: `${searchWithDot}%`})});
+            qq.orWhere({relatedAmount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa OR CAST(${alias} AS TEXT) LIKE :sw`, {sa: `${search}%`, sw: `${searchWithDot}%`})});
+            // if ((search).length > 2 && !(search).toString().includes('.')) {
+            //   const searchWithDot = +search / 100;
+            //   console.log('=================');
+            //   console.log(searchWithDot);
+            //   console.log('=================');
+            //   qq.orWhere({amount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${searchWithDot}%`})});
+            //   qq.orWhere({relatedAmount: Raw((alias) => `CAST(${alias} AS TEXT) LIKE :sa`, {sa: `${searchWithDot}%`})});
+            // }
           }
         });
       }

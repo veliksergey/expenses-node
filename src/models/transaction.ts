@@ -73,6 +73,30 @@ export class Transaction {
   })
   notes!: string;
 
+  // report condition
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: false,
+  })
+  reportCondition!: boolean;
+
+  // condition 1
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: false,
+  })
+  condition1!: boolean;
+
+  // condition 2
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: false,
+  })
+  condition2!: boolean;
+
   // account
   @Column({nullable: true})
   @Index()
