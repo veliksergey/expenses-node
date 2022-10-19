@@ -34,9 +34,7 @@ createConnection(dbConfig).then(connection => {
     // where: ((qb: any) => {
     //   qb.where(`(${whereDate}) AND (${whereAmount})`, whereObj)
     // }),
-    where: [
-
-    ],
+    order: {id: 'DESC'}
   }).then((rr) => {
     console.log(rr[0].length);
 
