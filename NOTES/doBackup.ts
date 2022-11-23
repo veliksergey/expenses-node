@@ -46,7 +46,8 @@ createConnection(dbConfig)
   // create folder in "backup"
   const t = new Date();
   const date = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
-  const time = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}:${String(t.getSeconds()).padStart(2, '0')}`;
+  let time = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}:${String(t.getSeconds()).padStart(2, '0')}`;
+  time = time.split(':').join('-');
   const folderPath = path.join(__dirname, 'backups', date);
   if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath);
@@ -85,7 +86,7 @@ createConnection(dbConfig)
     console.log(`-- Created ZIP folder weights ${archive.pointer()} bytes`);
 
     // move zip folder to Documents
-    let documentPath = '/home/serqio/Documents';
+    let documentPath = '/home/sergey/Documents';
     const finalFolder = path.join(documentPath, 'BACKUPS')
     if (!fs.existsSync(finalFolder)) {
       fs.mkdirSync(finalFolder);
