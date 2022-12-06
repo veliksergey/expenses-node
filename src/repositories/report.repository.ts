@@ -1,4 +1,4 @@
-import {getRepository, Raw} from 'typeorm';
+import {getRepository, Not, Raw} from 'typeorm';
 import {Transaction, Vendor} from '../models';
 
 interface iQueryPayload {
@@ -21,12 +21,14 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
   const personId = payload.personId;
   const vendorId = payload.vendorId;
   const groupBy = payload.groupBy;
+  const LOAN_PAYMENT_CATEGORY_ID = process.env.LOAN_PAYMENT_CATEGORY_ID || 0;
 
   let transactions = await transRepo.find({
     relations: relationTables,
     order: {date: 'DESC'},
     where: ((qb: any) => {
-      qb.where({projectId});
+      qb.where({projectId})
+          .andWhere({categoryId: Not(LOAN_PAYMENT_CATEGORY_ID)});
       // qb.andWhere({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = '2021'`)});
 
       if (accountId) qb.andWhere({accountId});
