@@ -6,6 +6,9 @@ import swaggerUi from 'swagger-ui-express';
 const path = require('path');
 import cors from 'cors';
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 import Router from './routes';
 import dbConfig from '../ormconfig';
 
