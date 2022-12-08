@@ -45,6 +45,12 @@ router.post('/', async(req, res) => {
   return res.json(response);
 })
 
+router.put('/:id/condition1', async (req, res) => {
+  const ctrl = new TransCtrl();
+  const response = await ctrl.setCondition1(req.params.id, req.body);
+  return res.json(response);
+})
+
 router.put('/:id', async (req, res) => {
   const ctrl = new TransCtrl();
   const response = await ctrl.updateTransaction(req.params.id, req.body);

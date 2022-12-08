@@ -58,7 +58,7 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
   const order = prepareOrder(payload.sortBy, payload.descending);
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;
-  const filters: { accountId: number, categoryId: number, personId: number, projectId: number, vendorId: number, date: string, type: number } = JSON.parse(payload.filters);
+  const filters: { accountId: number, categoryId: number, personId: number, projectId: number, vendorId: number, date: string, type: number, condition1Id: 'all' | 'false' | 'true' } = JSON.parse(payload.filters);
 
   let findOptions: any = {skip, take, order,};
 
@@ -107,6 +107,10 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
         if (filters.vendorId) qb.andWhere({vendorId: filters.vendorId});
         if (filters.type) qb.andWhere({type: filters.type});
         if (filters.date) qb.andWhere({date: filters.date});
+        if (['true', 'false'].includes(filters.condition1Id)) {
+          const condition = filters.condition1Id === 'true';
+          qb.andWhere({condition1: condition});
+        }
       }
 
     }),
@@ -238,6 +242,25 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
   } catch (err) {
     console.error(err);
     return {errMsg: 'Error in editing transaction!'};
+  }
+}
+
+export const setCondition1 = async (id: number, payload: {condition: boolean}): Promise<Transaction | {errMsg: string} | null> => {
+  const transRepo = getRepository(Transaction);
+  if (!id) return {errMsg: 'Missing transaction ID'};
+  const trans: Transaction | undefined = await transRepo.findOne(id);
+  if (!trans) return {errMsg: 'Cannot find a transaction to edit'};
+
+  trans.condition1 = payload.condition === true ? true : false;
+
+  console.log('-- trans:', trans);
+
+  try {
+    const savedTrans = await transRepo.save(trans);
+    return await getTransaction(savedTrans.id);
+  } catch (err) {
+    console.error(err);
+    return {errMsg: 'Error in setting condition1'};
   }
 }
 

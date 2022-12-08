@@ -7,6 +7,7 @@ import {
   iTransPayload,
   updateTransaction,
   getPossibleDuplicates,
+  setCondition1,
 } from '../repositories/transaction.repository';
 
 @Route('transactions')
@@ -54,6 +55,11 @@ export default class TransactionController {
   @Post('/')
   public async createTransaction(@Body() body: iTransPayload):Promise<Transaction | {errMsg: string} | null> {
     return createTransaction(body);
+  }
+
+  @Put('/{id}/condition1')
+  public async setCondition1(@Path() id: string, @Body() body: {condition: boolean}): Promise<Transaction | null | {errMsg: string}> {
+    return setCondition1(Number(id), body);
   }
 
   @Put('/{id}')

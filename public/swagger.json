@@ -770,6 +770,71 @@
 				}
 			}
 		},
+		"/transactions/{id}/condition1": {
+			"put": {
+				"operationId": "SetCondition1",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/Transaction"
+										},
+										{
+											"properties": {
+												"errMsg": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"errMsg"
+											],
+											"type": "object"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"transaction"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"condition": {
+										"type": "boolean"
+									}
+								},
+								"required": [
+									"condition"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/items/all": {
 			"get": {
 				"operationId": "GetAllItems",
