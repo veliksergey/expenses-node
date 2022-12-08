@@ -58,7 +58,7 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
   const order = prepareOrder(payload.sortBy, payload.descending);
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;
-  const filters: { accountId: number, categoryId: number, personId: number, projectId: number, vendorId: number, date: string, type: number, condition1Id: 'all' | 'false' | 'true' } = JSON.parse(payload.filters);
+  const filters: { accountId: number, categoryId: number, personId: number, projectId: number, vendorId: number, date: string, type: number, condition1Id: 'false' | 'true', excludeLoans: string } = JSON.parse(payload.filters);
 
   let findOptions: any = {skip, take, order,};
 
@@ -110,6 +110,10 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
         if (['true', 'false'].includes(filters.condition1Id)) {
           const condition = filters.condition1Id === 'true';
           qb.andWhere({condition1: condition});
+        }
+        if (filters.excludeLoans === 'true') {
+          const LOAN_PAYMENT_CATEGORY_ID = process.env.LOAN_PAYMENT_CATEGORY_ID || 0;
+          qb.andWhere({categoryId: Not(LOAN_PAYMENT_CATEGORY_ID)})
         }
       }
 
@@ -252,8 +256,6 @@ export const setCondition1 = async (id: number, payload: {condition: boolean}): 
   if (!trans) return {errMsg: 'Cannot find a transaction to edit'};
 
   trans.condition1 = payload.condition === true ? true : false;
-
-  console.log('-- trans:', trans);
 
   try {
     const savedTrans = await transRepo.save(trans);

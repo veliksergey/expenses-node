@@ -28,7 +28,8 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
     order: {date: 'DESC'},
     where: ((qb: any) => {
       qb.where({projectId})
-          .andWhere({categoryId: Not(LOAN_PAYMENT_CATEGORY_ID)});
+          .andWhere({categoryId: Not(LOAN_PAYMENT_CATEGORY_ID)})
+          // .andWhere({condition1: Not(true)})
       // qb.andWhere({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = '2021'`)});
 
       if (accountId) qb.andWhere({accountId});
