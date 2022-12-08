@@ -15,3 +15,8 @@ npm run typeorm schema:sync
 ts-node filename.ts
 
 // ToDo: backup files in "uploads" folder
+
+
+RESTORE DB:
+pg_restore --no-privileges --no-owner --dbname=postgresql://username:password@host:port/database file.sql
+https://gist.github.com/vielhuber/96eefdb3aff327bdf8230d753aaee1e1
