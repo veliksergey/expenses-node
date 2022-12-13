@@ -427,6 +427,9 @@
 					"vendorId": {
 						"type": "number",
 						"format": "double"
+					},
+					"condition1": {
+						"type": "boolean"
 					}
 				},
 				"required": [
@@ -449,7 +452,8 @@
 					"categoryId",
 					"personId",
 					"projectId",
-					"vendorId"
+					"vendorId",
+					"condition1"
 				],
 				"type": "object",
 				"additionalProperties": false

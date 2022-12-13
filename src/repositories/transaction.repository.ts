@@ -28,6 +28,7 @@ export interface iTransPayload {
   personId: number,
   projectId: number,
   vendorId: number,
+  condition1: boolean,
 }
 interface iQueryPayload {
   page: number,
@@ -225,6 +226,7 @@ export const updateTransaction = async (id: number, payload: iTransPayload): Pro
   trans.projectId = t.projectId;
   trans.vendorId = t.vendorId;
   trans.updatedAt = new Date();
+  trans.condition1 = t.condition1;
 
   try {
 
@@ -298,7 +300,7 @@ async function moveFileFromTempToUploads (transId: number, payload:
 // FUNCTIONS
 async function prepareTransactionForDB(trans: iTransPayload) {
   let {
-    type, name, amount, relatedAmount, date, relatedDate, notes, fileName, fileInTemp,
+    type, name, amount, relatedAmount, date, relatedDate, notes, fileName, fileInTemp, condition1,
     // accountId, categoryId, personId, projectId, vendorId,
     account, category, person, project, vendor} = trans;
 
@@ -308,6 +310,7 @@ async function prepareTransactionForDB(trans: iTransPayload) {
   let projectId = !project ? null : (typeof project === 'object') ? project.id : (await createItem('project', {name: project})).id;
   let vendorId = !vendor ? null : (typeof vendor === 'object') ? vendor.id : (await createItem('vendor', {name: vendor})).id;
 
+  condition1 = !!condition1;
   if (!relatedDate) relatedDate = null;
   if (!relatedAmount) relatedAmount = null;
   if (!accountId) accountId = null;
@@ -317,7 +320,7 @@ async function prepareTransactionForDB(trans: iTransPayload) {
   if (!vendorId) vendorId = null;
 
   return {
-    type, name, amount, relatedAmount, date, relatedDate, notes,
+    type, name, amount, relatedAmount, date, relatedDate, notes, condition1,
     accountId, categoryId, personId, projectId, vendorId,
   };
 }
