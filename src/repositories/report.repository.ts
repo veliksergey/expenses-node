@@ -42,7 +42,6 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
   transactions = transactions.map(t => {
     return {
       ...t,
-      amount: t.type === 1 ? -Math.abs(t.amount) : t.amount, // ToDo: ToChange
       accountName: t.account?.name || '',
       categoryName: t.category?.name || '',
       personName: t.person?.name || '',
