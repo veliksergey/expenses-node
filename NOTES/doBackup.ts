@@ -86,7 +86,7 @@ createConnection(dbConfig)
     console.log(`-- Created ZIP folder weights ${archive.pointer()} bytes`);
 
     // move zip folder to Documents
-    let documentPath = '/home/sergey/Documents';
+    let documentPath = '/home/serqio/Documents';
     const finalFolder = path.join(documentPath, 'BACKUPS')
     if (!fs.existsSync(finalFolder)) {
       fs.mkdirSync(finalFolder);
