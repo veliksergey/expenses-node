@@ -2,12 +2,12 @@ import {getRepository, Not, Raw} from 'typeorm';
 import {Transaction, Vendor} from '../models';
 
 interface iQueryPayload {
-  accountId: number,
-  categoryId: number,
-  personId: number,
   projectId: number,
-  vendorId: number,
+  categoryId: number,
+  year: string,
   groupBy: string,
+  condition1Id: 'false' | 'true' | 'all',
+  excludeLoans: string,
 }
 
 const relationTables = ['account', 'category', 'person', 'project', 'vendor', 'documents'];
@@ -15,12 +15,14 @@ const relationTables = ['account', 'category', 'person', 'project', 'vendor', 'd
 export const getReport = async (payload: iQueryPayload): Promise<any> => {
   const transRepo = getRepository(Transaction);
 
+  console.log('-- payload:', payload);
+
   const projectId = payload.projectId;
-  const accountId = payload.accountId;
   const categoryId = payload.categoryId;
-  const personId = payload.personId;
-  const vendorId = payload.vendorId;
+  const year = payload.year;
   const groupBy = payload.groupBy;
+  const condition1Id = payload.condition1Id;
+  const excludeLoans = payload.excludeLoans === 'true';
   const LOAN_PAYMENT_CATEGORY_ID = process.env.LOAN_PAYMENT_CATEGORY_ID || 0;
 
   let transactions = await transRepo.find({
@@ -28,14 +30,14 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
     order: {date: 'DESC'},
     where: ((qb: any) => {
       qb.where({projectId})
-          .andWhere({categoryId: Not(LOAN_PAYMENT_CATEGORY_ID)})
-          // .andWhere({condition1: Not(true)})
+          // .andWhere({condition1: Not(true)}) // tax condition (with partner or just myself)
       // qb.andWhere({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = '2021'`)});
 
-      if (accountId) qb.andWhere({accountId});
       if (categoryId) qb.andWhere({categoryId});
-      if (personId) qb.andWhere({personId});
-      if (vendorId) qb.andWhere({vendorId});
+      if (year) qb.and(({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = ${year}`)}));
+      // ToDo: GroupBy
+      if (['true', 'false'].includes(condition1Id)) qb.andWhere({condition1: condition1Id === 'true'});
+      if (excludeLoans) qb.andWhere({categoryId: Not(LOAN_PAYMENT_CATEGORY_ID)});
     })
   });
 

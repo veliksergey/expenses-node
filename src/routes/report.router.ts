@@ -4,15 +4,18 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const ctrl = new ReportCtrl();
-  
-  const accountId: string = (req.query.accountId || 0).toString();
-  const categoryId: string = (req.query.categoryId || 0).toString();
-  const personId: string = (req.query.personId || 0).toString();
-  const projectId: string = (req.query.projectId || 0).toString();
-  const vendorId: string = (req.query.vendorId || 0).toString();
-  const groupBy: string = (req.query.groupBy || '').toString();
 
-  const result = await ctrl.getReport(accountId, categoryId, personId, projectId, vendorId, groupBy);
+  console.log('** req.query:', req.query);
+
+  const projectId: string = (req.query.projectId || 0).toString();
+  const categoryId: string = (req.query.categoryId || 0).toString();
+  const year: string = (req.query.year || '').toString();
+  const groupBy: string = (req.query.groupBy || '').toString();
+  // @ts-ignore
+  const condition1Id: 'false'|'true'|'all' = (req.query.condition1Id || 'all').toString();
+  const excludeLoans: string = (req.query.excludeLoans || 'false').toString();
+
+  const result = await ctrl.getReport(projectId, categoryId, year, groupBy, condition1Id, excludeLoans);
   return res.json(result);
 });
 

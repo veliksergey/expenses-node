@@ -8,21 +8,24 @@ export default class ReportController {
 
   @Get('/')
   public async getReport(
-    @Query() accountId: string,
-    @Query() categoryId: string,
-    @Query() personId: string,
     @Query() projectId: string,
-    @Query() vendorId: string,
+    @Query() categoryId: string,
+    @Query() year: string,
     @Query() groupBy: string,
+    @Query() condition1Id: 'false' | 'true' | 'all',
+    @Query() excludeLoans: string,
   ): Promise<Array<Transaction>> {
 
+    console.log('## ctrl projectId:', projectId);
+    console.log('## ctrl excludeLoans:', excludeLoans);
+
     const params = {
-      accountId: +accountId,
-      categoryId: +categoryId,
-      personId: +personId,
       projectId: +projectId,
-      vendorId: +vendorId,
+      categoryId: +categoryId,
+      year,
       groupBy,
+      condition1Id,
+      excludeLoans,
     };
 
     return getReport(params);

@@ -1192,7 +1192,7 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "accountId",
+						"name": "projectId",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1208,23 +1208,7 @@
 					},
 					{
 						"in": "query",
-						"name": "personId",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "projectId",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "vendorId",
+						"name": "year",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1233,6 +1217,27 @@
 					{
 						"in": "query",
 						"name": "groupBy",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "condition1Id",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"false",
+								"true",
+								"all"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "excludeLoans",
 						"required": true,
 						"schema": {
 							"type": "string"
