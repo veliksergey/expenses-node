@@ -38,6 +38,19 @@ interface iQueryPayload {
   search: string,
   filters: string,
 }
+interface TransactionFilters {
+  accountId: number;
+  categoryId: number;
+  personId: number;
+  projectId: number;
+  vendorId: number;
+  date: string;
+  dateFrom: string;
+  dateTo: string;
+  year: string;
+  type: number;
+  condition1Id: 'false' | 'true';
+  excludeLoans: string }
 
 function prepareOrder(sortBy: string, descending: boolean): any {
   // return {project: {name: 'ASC'}};
@@ -59,7 +72,7 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
   const order = prepareOrder(payload.sortBy, payload.descending);
   const take: number = payload.rowsPerPage; // limit
   const skip: number = (payload.page - 1) * take;
-  const filters: { accountId: number, categoryId: number, personId: number, projectId: number, vendorId: number, date: string, type: number, condition1Id: 'false' | 'true', excludeLoans: string } = JSON.parse(payload.filters);
+  const filters: TransactionFilters = JSON.parse(payload.filters);
 
   let findOptions: any = {skip, take, order,};
 
@@ -108,6 +121,9 @@ export const getTransactions = async (payload: iQueryPayload): Promise<any> => {
         if (filters.vendorId) qb.andWhere({vendorId: filters.vendorId});
         if (filters.type) qb.andWhere({type: filters.type});
         if (filters.date) qb.andWhere({date: filters.date});
+        if (filters.dateFrom) qb.andWhere('date >= :dateFrom', {dateFrom: filters.dateFrom});
+        if (filters.dateTo) qb.andWhere('date <= :dateTo', {dateTo: filters.dateTo});
+        if (filters.year) qb.andWhere({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = '${filters.year}'`)});
         if (['true', 'false'].includes(filters.condition1Id)) {
           const condition = filters.condition1Id === 'true';
           qb.andWhere({condition1: condition});
