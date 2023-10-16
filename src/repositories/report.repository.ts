@@ -20,7 +20,8 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
   const projectId = payload.projectId;
   const categoryId = payload.categoryId;
   const year = payload.year;
-  const groupBy = payload.groupBy;
+  // const groupBy = payload.groupBy;
+  const groupBy = 'category'; // Todo
   const condition1Id = payload.condition1Id;
   const excludeLoans = payload.excludeLoans === 'true';
   const LOAN_PAYMENT_CATEGORY_ID = process.env.LOAN_PAYMENT_CATEGORY_ID || 0;
@@ -31,10 +32,9 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
     where: ((qb: any) => {
       qb.where({projectId})
           // .andWhere({condition1: Not(true)}) // tax condition (with partner or just myself)
-      // qb.andWhere({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = '2021'`)});
 
       if (categoryId) qb.andWhere({categoryId});
-      if (year) qb.and(({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = ${year}`)}));
+      if (year) qb.andWhere(({date: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = ${year}`)}));
       // ToDo: GroupBy
       if (['true', 'false'].includes(condition1Id)) qb.andWhere({condition1: condition1Id === 'true'});
       if (excludeLoans) qb.andWhere({categoryId: Not(LOAN_PAYMENT_CATEGORY_ID)});
@@ -52,12 +52,18 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
     };
   });
 
+  // brake by categories
   let resultObj: any = {};
-
   transactions.forEach((t: any) => {
 
+    // for one table
+    const title = 'All';
+    if (resultObj[title]) resultObj[title].push(t);
+    else resultObj[title] = [t];
+
+
     // table title
-    let title;
+    /*let title;
     if (t.reportCondition) title = 'REPORT_CONDITION';
     else if (groupBy) title = t[groupBy]?.name || 'NULL';
     else title = 'transactions';
@@ -66,7 +72,7 @@ export const getReport = async (payload: iQueryPayload): Promise<any> => {
       resultObj[title].push(t);
     } else {
       resultObj[title] = [t];
-    }
+    }*/
 
   });
 
