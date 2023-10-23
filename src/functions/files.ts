@@ -22,3 +22,8 @@ export const moveFile = ({
     return {errMsg: `Error in moving file to "${newFolder}" folder`};
   }
 };
+
+export const formatFileName = (fileName: string | number): string => {
+    // replaces everything which is not letter or number to underscore _
+    return String(fileName).replace(/[^a-z0-9]/gi, '_');
+}

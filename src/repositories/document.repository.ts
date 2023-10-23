@@ -30,3 +30,13 @@ export const createDocument = async (payload: iDocPayload): Promise<Document> =>
     ...payload
   });
 };
+
+export const uploadDocument = async (payload: iDocPayload): Promise<Document> => {
+  const docRepo = getRepository(Document);
+  const document = new Document();
+  return docRepo.save({
+    ...document,
+    ...payload,
+  });
+};
+
